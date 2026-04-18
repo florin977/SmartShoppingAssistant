@@ -8,12 +8,12 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
-            builder.ToTable("Category");
+            builder.ToTable("Categories");
 
             builder.HasKey(c => c.Id);
 
             builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
-            builder.Property(c => c.Description).IsRequired().HasMaxLength(500);
+            builder.Property(c => c.Description).HasMaxLength(500);
 
             builder.HasMany(c => c.Products)
                    .WithMany(p => p.Categories);

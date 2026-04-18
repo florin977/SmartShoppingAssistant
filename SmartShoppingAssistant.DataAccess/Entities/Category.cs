@@ -8,5 +8,6 @@
 
         public string Description { get; set; } = null!;
         public ICollection<Product> Products { get; set; } = new List<Product>();
+        public ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
     }
 }
