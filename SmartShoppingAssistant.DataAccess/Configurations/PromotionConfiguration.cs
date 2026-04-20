@@ -17,13 +17,6 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(p => p.Threshold).IsRequired().HasColumnType("decimal(10,2)");
             builder.Property(p => p.Reward).IsRequired();
             builder.Property(p => p.RewardValue).IsRequired();
-
-            builder.HasOne(p => p.Product)
-                   .WithMany(product => product.Promotions)
-                   .HasForeignKey(p => p.ProductId);
-            builder.HasOne(p => p.Category)
-                   .WithMany(category => category.Promotions)
-                   .HasForeignKey(p => p.CategoryId);
         }
     }
 }

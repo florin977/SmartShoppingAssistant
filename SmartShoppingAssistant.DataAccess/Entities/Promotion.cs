@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SmartShoppingAssistant.DataAccess.Entities
+﻿namespace SmartShoppingAssistant.DataAccess.Entities
 {
     public class Promotion
     {
@@ -22,14 +18,10 @@ namespace SmartShoppingAssistant.DataAccess.Entities
         }
         public RewardType Reward { get; set; }
         public int RewardValue { get; set; }
-        public bool IsActive { get; set; }
-
         public int ProductId { get; set; }
-        // Auto-included navigation property for the related Product entity
         public Product Product { get; set; } = null!;
         public int CategoryId { get; set; }
-        // Auto-included navigation property for the related Category entity
         public Category Category { get; set; } = null!;
-
+        public bool IsActive { get; set; }
     }
 }

@@ -15,8 +15,9 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
             builder.Property(c => c.Description).HasMaxLength(500);
 
-            builder.HasMany(c => c.Products)
-                   .WithMany(p => p.Categories);
+            builder.HasMany(c => c.Promotions)
+                   .WithOne(pr => pr.Category)
+                   .HasForeignKey(pr => pr.CategoryId);
         }
     }
 }

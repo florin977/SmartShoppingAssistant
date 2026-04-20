@@ -16,10 +16,21 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(p => p.Description).HasMaxLength(1000);
             builder.Property(p => p.Price).IsRequired().HasColumnType("decimal(10,2)");
             builder.Property(p => p.ImageUrl).HasMaxLength(500);
+            builder.Property(p => p.Stock).IsRequired();
+            // Ensure the stock never goes negative
+            builder.ToTable(t => t.HasCheckConstraint("CK_Product_Stock_NonNegative", "[Stock] >= 0"));
 
             builder.HasMany(p => p.Categories)
                    .WithMany(c => c.Products)
                    .UsingEntity(j => j.ToTable("ProductCategories"));
+
+            builder.HasMany(p => p.Promotions)
+                   .WithOne(pr => pr.Product)
+                   .HasForeignKey(pr => pr.ProductId);
+
+            builder.HasMany(p => p.CartItems)
+                   .WithOne(ci => ci.Product)
+                   .HasForeignKey(ci => ci.ProductId);
         }
     }
 }
