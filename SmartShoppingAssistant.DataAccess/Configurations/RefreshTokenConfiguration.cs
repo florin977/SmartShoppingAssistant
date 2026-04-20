@@ -10,9 +10,11 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
         {
             builder.ToTable("RefreshTokens");
             builder.HasKey(rt => rt.Id);
+            builder.HasIndex(rt => rt.Token).IsUnique();
 
+            builder.Property(rt => rt.UserId).IsRequired();
             builder.Property(rt => rt.Token).IsRequired().HasMaxLength(255);
-            builder.Property(rt => rt.ExpiresAt).IsRequired();
+            builder.Property(rt => rt.JwtId).IsRequired();
             builder.Property(rt => rt.ExpiresAt).IsRequired();
             builder.Property(rt => rt.RevokedAt).IsRequired(false);
         }
