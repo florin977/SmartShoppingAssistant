@@ -8,6 +8,7 @@
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = null!;
         public int Stock { get; set; }
+
         public ICollection<Category> Categories { get; set; } = new List<Category>();
         public ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();

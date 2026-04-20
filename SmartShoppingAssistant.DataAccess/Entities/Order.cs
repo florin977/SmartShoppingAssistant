@@ -2,9 +2,6 @@
 {
     public class Order
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
         public enum StatusType
         {
             Pending,
@@ -12,7 +9,11 @@
             Shipping,
             Shipped,
             Cancelled
-        }; 
+        };
+
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
         public StatusType Status { get; set; }
         public DateTime PlacedAt { get; set; }
         public DateTime ExpectedArrival { get; set; }
