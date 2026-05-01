@@ -8,7 +8,8 @@ namespace SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles
     {
         public ProductProfile()
         {
-            CreateMap<ProductPostDTO, Product>();
+            CreateMap<ProductPostDTO, Product>()
+                .ForMember(dest => dest.Categories, opt => opt.Ignore());
             CreateMap<ProductPutDTO, Product>();
             CreateMap<Product, ProductGetDTO>();
         }

@@ -3,10 +3,11 @@ using SmartShoppingAssistant.BusinessLogic.DTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository;
+using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class ProductService(IRepository<Product> productRepository, IMapper mapper) : IProductService
+    public class ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper) : IProductService
     {
         public async Task<ProductGetDTO> GetByIdAsync(int id)
         {
@@ -23,6 +24,10 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         public async Task<ProductGetDTO> AddAsync(ProductPostDTO productPostDTO)
         {
             var product = mapper.Map<Product>(productPostDTO);
+            // Get all the categories that match the provided category IDs and assign them to the product
+            var categories = await categoryRepository.GetCategoriesWithIdsAsync(productPostDTO.CategoryIds);
+            product.Categories = categories.ToList();
+
             var createdProduct = await productRepository.AddAsync(product);
             return mapper.Map<ProductGetDTO>(createdProduct);
         }
@@ -31,6 +36,14 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         {
             var queriedProduct = await productRepository.GetByIdAsync(id);
             mapper.Map(productPutDTO, queriedProduct);
+            // Update the product's categories based on the provided category IDs
+            queriedProduct.Categories.Clear(); // Clear existing categories
+            var newCategories = await categoryRepository.GetCategoriesWithIdsAsync(productPutDTO.CategoryIds);
+            foreach (var Category in newCategories) 
+            {
+                queriedProduct.Categories.Add(Category);
+            }
+
             var updatedProduct = await productRepository.UpdateAsync(queriedProduct);
             return mapper.Map<ProductGetDTO>(updatedProduct);
         }

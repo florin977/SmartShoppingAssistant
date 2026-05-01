@@ -45,7 +45,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             }
         }
 
-        public async Task<List<TEntity>> GetAllAsync()
+        virtual public async Task<List<TEntity>> GetAllAsync()
         {
             try
             {
@@ -66,7 +66,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             }
         }
 
-        public async Task<TEntity> GetByIdAsync(int id)
+        virtual public async Task<TEntity> GetByIdAsync(int id)
         {
             try
             {

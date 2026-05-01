@@ -5,6 +5,7 @@ using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository;
+using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +20,9 @@ var ConnectionString = builder.Configuration.GetConnectionString("ExperimentData
 builder.Services.AddDbContext<SmartShoppingAssistantDbContext>(options =>
     options.UseSqlServer(ConnectionString));
 
-builder.Services.AddScoped<IRepository<Product>, BaseRepository<Product>>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IRepository<Category>, BaseRepository<Category>>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // AutoMapper
