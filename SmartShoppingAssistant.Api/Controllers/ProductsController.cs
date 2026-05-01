@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs;
-using SmartShoppingAssistant.BusinessLogic.Services;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 
 namespace SmartShoppingAssistant.Api.Controllers
@@ -40,11 +39,11 @@ namespace SmartShoppingAssistant.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ProductGetDTO>> Add(ProductAddDTO productAddDTO)
+        public async Task<ActionResult<ProductGetDTO>> Add(ProductPostDTO productPostDTO)
         {
             try
             {
-                var addedProduct = await productService.AddAsync(productAddDTO);
+                var addedProduct = await productService.AddAsync(productPostDTO);
                 return Ok(addedProduct);
             }
             catch (Exception ex)

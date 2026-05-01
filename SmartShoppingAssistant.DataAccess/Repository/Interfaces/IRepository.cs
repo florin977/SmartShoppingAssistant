@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SmartShoppingAssistant.DataAccess.Repository.Interfaces
+﻿namespace SmartShoppingAssistant.DataAccess.Repository
 {
-    internal interface IRepository
+    public interface IRepository<TEntity> where TEntity : class
     {
+        Task<TEntity?> GetByIdAsync(int id);
+        Task<List<TEntity>> GetAllAsync();
+        Task<TEntity> AddAsync(TEntity entity);
+        Task<TEntity> UpdateAsync(TEntity entity);
+        Task DeleteAsync(int id);
     }
 }

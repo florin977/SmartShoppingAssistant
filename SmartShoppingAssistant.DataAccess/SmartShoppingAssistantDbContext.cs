@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SmartShoppingAssistant.DataAccess
 {
-    public class SmartShoppingAssistantDbContext(DbContextOptions<SmartShoppingAssistantDbContext> options) : DbContext
+    public class SmartShoppingAssistantDbContext(DbContextOptions<SmartShoppingAssistantDbContext> options) : DbContext(options)
     {
         // Principal entities
         public DbSet<User> Users { get; set; } = null!;

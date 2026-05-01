@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles;
 using SmartShoppingAssistant.BusinessLogic.Services;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
@@ -13,13 +14,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var ConnectionString = builder.Configuration.GetConnectionString("SmartShoppingAssistantContext");
+var ConnectionString = builder.Configuration.GetConnectionString("ExperimentDatabase");
 
 builder.Services.AddDbContext<SmartShoppingAssistantDbContext>(options =>
     options.UseSqlServer(ConnectionString));
 
 builder.Services.AddScoped<IRepository<Product>, BaseRepository<Product>>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+// AutoMapper
+// Ensure that BusinessLogic loads, no need to include all the profiles
+// besides this one here since they are in the same assembly
+builder.Services.AddAutoMapper(cfg => { }, typeof(ProductProfile).Assembly);
 
 var app = builder.Build();
 
