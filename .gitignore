@@ -55,3 +55,7 @@ nunit-*.xml
 
 # Cached files
 .vs/
+
+#Postman
+.postman/
+postman/
