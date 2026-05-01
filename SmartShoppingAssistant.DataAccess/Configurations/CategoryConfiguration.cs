@@ -17,7 +17,8 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
 
             builder.HasMany(c => c.Promotions)
                    .WithOne(pr => pr.Category)
-                   .HasForeignKey(pr => pr.CategoryId);
+                   .HasForeignKey(pr => pr.CategoryId)
+                   .IsRequired(false);
         }
     }
 }
