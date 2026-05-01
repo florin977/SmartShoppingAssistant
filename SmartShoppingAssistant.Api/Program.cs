@@ -21,6 +21,8 @@ builder.Services.AddDbContext<SmartShoppingAssistantDbContext>(options =>
 
 builder.Services.AddScoped<IRepository<Product>, BaseRepository<Product>>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IRepository<Category>, BaseRepository<Category>>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles
