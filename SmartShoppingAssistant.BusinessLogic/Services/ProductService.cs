@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SmartShoppingAssistant.BusinessLogic.DTOs;
+using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository;
@@ -19,6 +20,12 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         {
             var products = await productRepository.GetAllAsync();
             return mapper.Map<IEnumerable<ProductGetDTO>>(products);
+        }
+        public async Task<IEnumerable<ProductGetDTO>> GetFilteredAsync(ProductQueryDTO productQuery)
+        {
+            var queryParameters = mapper.Map<DataAccess.Repository.Parameters.ProductQueryParameters>(productQuery);
+            var filteredProducts = await productRepository.GetFilteredAsync(queryParameters);
+            return mapper.Map<IEnumerable<ProductGetDTO>>(filteredProducts);
         }
 
         public async Task<ProductGetDTO> AddAsync(ProductPostDTO productPostDTO)
