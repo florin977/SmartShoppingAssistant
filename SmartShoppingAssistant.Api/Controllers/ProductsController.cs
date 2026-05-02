@@ -9,6 +9,19 @@ namespace SmartShoppingAssistant.Api.Controllers
     [ApiController]
     public class ProductsController(IProductService productService) : ControllerBase
     {
+        [HttpPost]
+        public async Task<ActionResult<ProductGetDTO>> Add(ProductPostDTO productPostDTO)
+        {
+            try
+            {
+                var addedProduct = await productService.AddAsync(productPostDTO);
+                return Ok(addedProduct);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductGetDTO>> GetById(int id)
         {
@@ -37,21 +50,6 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return StatusCode(500, new { message = "Internal server error: " + ex.Message });
             }
         }
-
-        [HttpPost]
-        public async Task<ActionResult<ProductGetDTO>> Add(ProductPostDTO productPostDTO)
-        {
-            try
-            {
-                var addedProduct = await productService.AddAsync(productPostDTO);
-                return Ok(addedProduct);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductGetDTO>> Update(int id, ProductPutDTO productPutDTO)
         {
@@ -69,7 +67,6 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return BadRequest(ex);
             }
         }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

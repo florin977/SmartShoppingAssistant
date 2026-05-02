@@ -8,6 +8,19 @@ namespace SmartShoppingAssistant.Api.Controllers
     [ApiController]
     public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
+        [HttpPost]
+        public async Task<ActionResult<CategoryGetDTO>> Add(CategoryPostDTO categoryPostDTO)
+        {
+            try
+            {
+                var addedCategory = await categoryService.AddAsync(categoryPostDTO);
+                return Ok(addedCategory);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryGetDTO>> GetById(int id)
         {
@@ -34,19 +47,7 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return StatusCode(500, new { message = "Internal server error: " + ex.Message });
             }
         }
-        [HttpPost]
-        public async Task<ActionResult<CategoryGetDTO>> Add(CategoryPostDTO categoryPostDTO)
-        {
-            try
-            {
-                var addedCategory = await categoryService.AddAsync(categoryPostDTO);
-                return Ok(addedCategory);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryGetDTO>> Update(int id, CategoryPutDTO categoryPutDTO)
         {

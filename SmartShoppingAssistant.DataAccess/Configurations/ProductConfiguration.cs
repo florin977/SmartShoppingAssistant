@@ -29,7 +29,6 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
                    .HasForeignKey(pr => pr.ProductId)
                    .IsRequired(false);
 
-            // On main branch this is a one-to-one relationship
             builder.HasMany(p => p.CartItems)
                    .WithOne(ci => ci.Product)
                    .HasForeignKey(ci => ci.ProductId);
