@@ -13,10 +13,13 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                     .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
+            // TODO: Maybe remove the comments ? Might need to create a cart on the fly if it doesn't exist
+            /*
             if (cart == null)
             {
                 throw new Exception($"Cart not found for queried user");
             }
+            */
 
             return cart;
         }
