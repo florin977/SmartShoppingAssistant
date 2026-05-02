@@ -13,6 +13,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var product = await context.Set<Product>()
                .Include(p => p.Categories)
+               .Include(p => p.Promotions.Where(pr => pr.IsActive))
                .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (product == null)
@@ -33,6 +34,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var products = await context.Set<Product>()
                     .Include(p => p.Categories)
+                    .Include(p => p.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
                 return products;
             }
@@ -47,6 +49,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var query = context.Set<Product>()
                     .Include(p => p.Categories)
+                    .Include(p => p.Promotions.Where(pr => pr.IsActive))
                     .AsQueryable();
                 if (!string.IsNullOrEmpty(productQueryParameters.Search))
                 {

@@ -1,4 +1,5 @@
 ﻿using SmartShoppingAssistant.BusinessLogic.DTOs.CategoryDTOs;
+using SmartShoppingAssistant.BusinessLogic.DTOs.PromotionDTOs;
 using SmartShoppingAssistant.DataAccess.Entities;
 
 namespace SmartShoppingAssistant.BusinessLogic.DTOs
@@ -13,5 +14,6 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs
         public int Stock { get; set; }
         // Automapper handles category -> categoryDTO mapping, so I can directly use CategoryGetDTO here
         public ICollection<CategoryGetDTO> Categories { get; set; } = null!;
+        public ICollection<PromotionGetDTO> Promotions { get; set; } = null!;
     }
 }

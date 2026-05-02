@@ -8,9 +8,12 @@ namespace SmartShoppingAssistant.DataAccess.Repository
     {
         public async Task<Cart> GetCartByUserIdAsync(int userId)
         {
+            // Ask about the nesting of the includes, is it too much ?
             var cart = await context.Set<Cart>()
                 .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Categories)
+                            .ThenInclude(pc => pc.Promotions)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             // TODO: Maybe remove the comments ? Might need to create a cart on the fly if it doesn't exist
@@ -21,6 +24,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             }
             */
 
+            // Ignore the warning, we will handle the case where the cart is null in the service layer, and create a new cart if it doesn't exist
             return cart;
         }
     }

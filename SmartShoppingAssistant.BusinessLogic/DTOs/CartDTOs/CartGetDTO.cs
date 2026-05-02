@@ -7,6 +7,7 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs.CartDTOs
         public int Id { get; set; }
         public int UserId { get; set; }
         public ICollection<CartItemGetDTO> CartItems { get; set; } = new List<CartItemGetDTO>();
-        public decimal Total { get; set; }
+        public decimal TotalBeforeDiscount { get; set; }
+        public decimal TotalAfterDiscount { get; set; }
     }
 }

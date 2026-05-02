@@ -1,17 +1,34 @@
 ﻿using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace SmartShoppingAssistant.DataAccess.Repository
 {
     public class CategoryRepository(SmartShoppingAssistantDbContext context) : BaseRepository<Category>(context), ICategoryRepository
     {
+        public async override Task<List<Category>> GetAllAsync()
+        {
+            try
+            {
+                var categories = await context.Set<Category>()
+                    .Include(c => c.Products)
+                    .Include(c => c.Promotions.Where(pr => pr.IsActive))
+                    .ToListAsync();
+                return categories;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while fetching categories: {ex.Message}", ex);
+            }
+        }
         public async Task<ICollection<Category>> GetCategoriesWithIdsAsync(List<int> ids)
         {
             try
             {
                 var categories = await context.Set<Category>()
                     .Where(c => ids.Contains(c.Id))
+                    .Include(c => c.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
 
                 if (categories.Count == 0)
@@ -33,6 +50,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var category = await context.Set<Category>()
                .Include(c => c.Products)
+               .Include(c => c.Promotions.Where(pr => pr.IsActive))
                .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (category == null)

@@ -9,17 +9,34 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 {
     public class CartService(ICartRepository cartRepository, IMapper mapper) : ICartService
     {
+        private static IEnumerable<Promotion> GetEligiblePromotions(CartItem item)
+        {
+            var productPromotions = item.Product.Promotions ?? Enumerable.Empty<Promotion>();
+
+            var categoryPromotions = item.Product.Categories
+                .SelectMany(c => c.Promotions ?? Enumerable.Empty<Promotion>());
+
+            return productPromotions
+                .Concat(categoryPromotions)
+                .DistinctBy(p => p.Id);
+        }
+
         public async Task<CartGetDTO> GetCartAsync(int userId)
         {
             var cart = await cartRepository.GetCartByUserIdAsync(userId);
-            return mapper.Map<CartGetDTO>(cart);
+            var cartDTO = mapper.Map<CartGetDTO>(cart);
+            cartDTO.TotalBeforeDiscount = cart.CartItems.Sum(ci => ci.Quantity * ci.Product.Price);
+            
+            
+
+            return cartDTO;
         }
 
         public async Task<CartGetDTO> AddItemToCartAsync(int userId, CartItemPostDTO cartItemPostDTO)
         {
             var cart = await cartRepository.GetCartByUserIdAsync(userId);
 
-            // TODO: Remove after implementing User authentication and authorization
+            // TODO: Remove after implementing User authentication and authorization, or not.
             if (cart == null)
             {
                 cart = new Cart { UserId = userId, CartItems = new List<CartItem>() };
