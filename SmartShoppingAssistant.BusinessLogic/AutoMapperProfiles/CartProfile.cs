@@ -11,6 +11,7 @@ namespace SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles
         public CartProfile() 
         {
             CreateMap<Cart, CartGetDTO>();
+            CreateMap<CartCreateDTO, Cart>();
         }
     }
 }

@@ -19,15 +19,18 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
 
             builder.HasMany(u => u.Orders)
                    .WithOne(o => o.User)
-                   .HasForeignKey(o => o.UserId);
+                   .HasForeignKey(o => o.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(u => u.RefreshTokens)
                    .WithOne(rt => rt.User)
-                   .HasForeignKey(rt => rt.UserId);
+                   .HasForeignKey(rt => rt.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(u => u.Cart)
                    .WithOne(c => c.User)
-                   .HasForeignKey<Cart>(c => c.UserId);
+                   .HasForeignKey<Cart>(c => c.UserId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

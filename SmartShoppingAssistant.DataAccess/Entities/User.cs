@@ -1,18 +1,14 @@
-﻿namespace SmartShoppingAssistant.DataAccess.Entities
+﻿using SmartShoppingAssistant.DataAccess.Entities.Enums;
+
+namespace SmartShoppingAssistant.DataAccess.Entities
 {
     public class User
     {
-        public enum RoleType
-        {
-            Customer,
-            Admin
-        };
-
         public int Id { get; set; }
         public string Username { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public RoleType Role { get; set; }
+        public UserRole Role { get; set; }
         public DateTime CreatedAt { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
