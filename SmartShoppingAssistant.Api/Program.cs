@@ -42,6 +42,9 @@ builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles
 // besides this one here since they are in the same assembly

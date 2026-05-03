@@ -4,7 +4,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
 {
     public class BaseRepository<TEntity>(SmartShoppingAssistantDbContext context) : IRepository<TEntity> where TEntity : class
     {
-        public async Task<TEntity> AddAsync(TEntity entity)
+        virtual public async Task<TEntity> AddAsync(TEntity entity)
         {
             try
             {

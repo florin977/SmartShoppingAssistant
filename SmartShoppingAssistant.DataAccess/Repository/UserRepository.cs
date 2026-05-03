@@ -8,13 +8,27 @@ namespace SmartShoppingAssistant.DataAccess.Repository
     {
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await context.Set<User>().FirstOrDefaultAsync(u => u.Email == email);
+            var user = await context.Set<User>().FirstOrDefaultAsync(u => u.Email == email);
+
+            return user;
         }
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            return await context.Set<User>().FirstOrDefaultAsync(u => u.Username == username);
+            var user = await context.Set<User>().FirstOrDefaultAsync(u => u.Username == username);
+            
+            return user;
         }
-        public async Task<User> AddAsync(User user)
+
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await context.Set<User>().AnyAsync(u => u.Email == email);
+        }
+        public async Task<bool> ExistsByUsernameAsync(string username)
+        {
+            return await context.Set<User>().AnyAsync(u => u.Username == username);
+        }
+
+        public override async Task<User> AddAsync(User user)
         {
             user.Cart = new Cart();
             return await base.AddAsync(user); // Throws on failure

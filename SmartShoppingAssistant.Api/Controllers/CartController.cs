@@ -12,12 +12,6 @@ namespace SmartShoppingAssistant.Api.Controllers
     [ApiController]
     public class CartController(ICartService cartService) : ControllerBase
     {
-        private int? GetUserId()
-        {
-            var claim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.TryParse(claim, out int id) ? id : null;
-        }
-
         [HttpPost("items")]
         public async Task<ActionResult> AddItemToCart([FromBody] CartItemPostDTO cartItemPostDTO)
         {

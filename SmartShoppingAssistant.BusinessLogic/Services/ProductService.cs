@@ -3,7 +3,6 @@ using SmartShoppingAssistant.BusinessLogic.DTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
-using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
