@@ -10,11 +10,14 @@ namespace SmartShoppingAssistant.DataAccess.Repository
         {
             // Ask about the nesting of the includes, is it too much ?
             var cart = await context.Set<Cart>()
-                .Include(c => c.CartItems)
-                    .ThenInclude(ci => ci.Product)
-                        .ThenInclude(p => p.Categories)
-                            .ThenInclude(pc => pc.Promotions)
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+                 .Include(c => c.CartItems)
+                     .ThenInclude(ci => ci.Product)
+                         .ThenInclude(p => p.Promotions)
+                 .Include(c => c.CartItems)
+                     .ThenInclude(ci => ci.Product)
+                         .ThenInclude(p => p.Categories)
+                             .ThenInclude(c => c.Promotions)
+                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             // TODO: Maybe remove the comments ? Might need to create a cart on the fly if it doesn't exist
             /*
