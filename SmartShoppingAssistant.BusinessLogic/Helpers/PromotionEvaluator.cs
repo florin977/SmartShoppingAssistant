@@ -33,6 +33,62 @@ namespace SmartShoppingAssistant.BusinessLogic.Helpers
             return (byProduct, byCategory);
         }
 
+        // Returns the total price of the promotion's scope:
+        // product total, category total, or the entire cart total if no scope is specified.
+        private static decimal GetApplicableTotal(
+            PromotionGetDTO p,
+            Dictionary<int, (int Quantity, decimal Total)> byProduct,
+            Dictionary<int, (int Quantity, decimal Total)> byCategory,
+            decimal cartTotal)
+        {
+            if (p.ProductId.HasValue)
+                return byProduct.TryGetValue(p.ProductId.Value, out var prod) ? prod.Total : 0;
+
+            if (p.CategoryId.HasValue)
+                return byCategory.TryGetValue(p.CategoryId.Value, out var cat) ? cat.Total : 0;
+
+            return cartTotal;
+        }
+
+        // Returns the total quantity of the promotion's scope:
+        // product quantity, category quantity, or the entire cart quantity if no scope is specified.
+        private static int GetApplicableQuantity(
+            PromotionGetDTO p,
+            Dictionary<int, (int Quantity, decimal Total)> byProduct,
+            Dictionary<int, (int Quantity, decimal Total)> byCategory)
+        {
+            if (p.ProductId.HasValue)
+                return byProduct.TryGetValue(p.ProductId.Value, out var prod) ? prod.Quantity : 0;
+
+            if (p.CategoryId.HasValue)
+                return byCategory.TryGetValue(p.CategoryId.Value, out var cat) ? cat.Quantity : 0;
+
+            return byProduct.Values.Sum(p => p.Quantity);
+        }
+
+        // Returns the cheapest item in the promotion's scope:
+        // within the product, category, or the entire cart if no scope is specified.
+        private static CartItemGetDTO? GetCheapestItem(
+            PromotionGetDTO p,
+            IEnumerable<CartItemGetDTO> items)
+        {
+            if (p.ProductId.HasValue)
+                return items
+                    .Where(i => i.Product.Id == p.ProductId.Value)
+                    .OrderBy(i => i.Product.Price)
+                    .FirstOrDefault();
+
+            if (p.CategoryId.HasValue)
+                return items
+                    .Where(i => i.Product.Categories.Any(c => c.Id == p.CategoryId.Value))
+                    .OrderBy(i => i.Product.Price)
+                    .FirstOrDefault();
+
+            return items
+                .OrderBy(i => i.Product.Price)
+                .FirstOrDefault();
+        }
+
         // Only active promotions are returned from the repository, so no need to check IsActive here.
         private static IEnumerable<PromotionGetDTO> GetAllPromotions(CartItemGetDTO item)
         {
@@ -54,20 +110,8 @@ namespace SmartShoppingAssistant.BusinessLogic.Helpers
         {
             return p.Type switch
             {
-                PromotionType.Quantity =>
-                    p.ProductId.HasValue
-                        ? byProduct.TryGetValue(p.ProductId.Value, out var prod) && prod.Quantity >= p.Threshold
-                        : p.CategoryId.HasValue
-                            ? byCategory.TryGetValue(p.CategoryId.Value, out var cat) && cat.Quantity >= p.Threshold
-                            : false,
-
-                PromotionType.CartTotal =>
-                    p.ProductId.HasValue
-                        ? byProduct.TryGetValue(p.ProductId.Value, out var prod) && prod.Total >= p.Threshold
-                        : p.CategoryId.HasValue
-                            ? byCategory.TryGetValue(p.CategoryId.Value, out var cat) && cat.Total >= p.Threshold
-                            : cartTotal >= p.Threshold,
-
+                PromotionType.Quantity => GetApplicableQuantity(p, byProduct, byCategory) >= p.Threshold,
+                PromotionType.CartTotal => GetApplicableTotal(p, byProduct, byCategory, cartTotal) >= p.Threshold,
                 _ => false
             };
         }
@@ -94,32 +138,12 @@ namespace SmartShoppingAssistant.BusinessLogic.Helpers
             return p.Reward switch
             {
                 PromotionReward.PercentDiscount =>
-                    (
-                        (p.ProductId.HasValue
-                            ? byProduct.TryGetValue(p.ProductId.Value, out var prod) ? prod.Total : 0
-                            : p.CategoryId.HasValue
-                                ? byCategory.TryGetValue(p.CategoryId.Value, out var cat) ? cat.Total : 0
-                                : cartTotal) * (p.RewardValue / 100m),
-                        0,
-                        (int?)null
-                    ),
+                    (GetApplicableTotal(p, byProduct, byCategory, cartTotal) * (p.RewardValue / 100m), 0, null),
 
-                PromotionReward.FreeItems when p.ProductId.HasValue =>
-                    (
-                        p.RewardValue * (byProduct.TryGetValue(p.ProductId.Value, out var prod)
-                            ? prod.Total / prod.Quantity
-                            : 0),
-                        p.RewardValue,
-                        p.ProductId
-                    ),
-
-                PromotionReward.FreeItems when p.CategoryId.HasValue =>
-                    items
-                        .Where(i => i.Product.Categories.Any(c => c.Id == p.CategoryId.Value))
-                        .OrderBy(i => i.Product.Price)
-                        .FirstOrDefault() is { } cheapest
-                            ? (p.RewardValue * cheapest.Product.Price, p.RewardValue, (int?)cheapest.Product.Id)
-                            : (0, 0, null),
+                PromotionReward.FreeItems =>
+                    GetCheapestItem(p, items) is { } cheapest
+                        ? (p.RewardValue * cheapest.Product.Price, p.RewardValue, (int?)cheapest.Product.Id)
+                        : (0, 0, null),
 
                 _ => (0, 0, null)
             };
