@@ -9,5 +9,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
         Task<IEnumerable<PromotionGetDTO>> GetAllAsync();
         Task<PromotionGetDTO> UpdateAsync(int id, PromotionPutDTO promotionPutDTO);
         Task DeleteAsync(int id);
+        Task<PromotionGetDTO> GetActivePromotionByIdAsync(int id);
+        Task<IEnumerable<PromotionGetDTO>> GetAllActivePromotionsAsync();
     }
 }

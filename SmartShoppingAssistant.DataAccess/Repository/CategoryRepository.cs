@@ -31,11 +31,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                     .Include(c => c.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
 
-                if (categories.Count == 0)
-                {
-                    throw new KeyNotFoundException("No categories found with the provided IDs.");
-                }
-
                 return categories;
             }
             catch (Exception ex)

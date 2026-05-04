@@ -7,8 +7,7 @@ using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class PromotionService(IRepository<Promotion> promotionRepository, IProductRepository productRepository, 
-                                  ICategoryRepository categoryRepository, IMapper mapper) : IPromotionService
+    public class PromotionService(IPromotionRepository promotionRepository, IMapper mapper) : IPromotionService
     {
         public async Task<PromotionGetDTO> AddAsync(PromotionPostDTO promotionPostDTO)
         {
@@ -36,6 +35,17 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         public async Task DeleteAsync(int id)
         {
             await promotionRepository.DeleteAsync(id);
+        }
+
+        public async Task<PromotionGetDTO> GetActivePromotionByIdAsync(int id)
+        {
+            var activePromotion = await promotionRepository.GetActivePromotionByIdAsync(id);
+            return mapper.Map<PromotionGetDTO>(activePromotion);
+        }
+        public async Task<IEnumerable<PromotionGetDTO>> GetAllActivePromotionsAsync()
+        {
+            var activePromotions = await promotionRepository.GetAllActivePromotionsAsync();
+            return mapper.Map<List<PromotionGetDTO>>(activePromotions);
         }
     }
 }

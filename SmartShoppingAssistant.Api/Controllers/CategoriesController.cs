@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CategoryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 
@@ -9,6 +10,7 @@ namespace SmartShoppingAssistant.Api.Controllers
     public class CategoriesController(ICategoryService categoryService) : ControllerBase
     {
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryGetDTO>> Add(CategoryPostDTO categoryPostDTO)
         {
             try
@@ -49,6 +51,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         }
         
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<CategoryGetDTO>> Update(int id, CategoryPutDTO categoryPutDTO)
         {
             try
@@ -62,6 +65,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> Delete(int id)
         {
             try

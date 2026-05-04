@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
@@ -11,6 +12,7 @@ namespace SmartShoppingAssistant.Api.Controllers
     public class ProductsController(IProductService productService) : ControllerBase
     {
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductGetDTO>> Add(ProductPostDTO productPostDTO)
         {
             try
@@ -52,6 +54,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductGetDTO>> Update(int id, ProductPutDTO productPutDTO)
         {
             try
@@ -61,14 +64,15 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
             catch (Exception ex) when (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
             {
-                return NotFound(ex);
+                return NotFound(new { message = ex.Message});
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new { message = ex.Message });
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try

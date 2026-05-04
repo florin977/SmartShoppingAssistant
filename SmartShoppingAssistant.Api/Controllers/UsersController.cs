@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs.UserDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
+using System.Security.Claims;
 
 namespace SmartShoppingAssistant.Api.Controllers
 {
@@ -34,9 +36,25 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return Unauthorized(new { message = ex.Message });
             }
         }
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
+            var userIdClaimString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdClaimString, out int userIdClaim))
+            {
+                // Valid token, but invalid user ID claim
+                return Unauthorized(new { message = "Invalid user ID claim." });
+            }
+
+            bool isAdmin = User.IsInRole("Admin");
+            bool isOwnAccount = userIdClaim == id;
+
+            if (!isAdmin && !isOwnAccount)
+            {
+                return Forbid();
+            }
+
             try
             {
                 await userService.DeleteAsync(id);

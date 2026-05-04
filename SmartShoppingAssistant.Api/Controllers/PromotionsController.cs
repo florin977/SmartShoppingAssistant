@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs.PromotionDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 
@@ -10,6 +11,7 @@ namespace SmartShoppingAssistant.Api.Controllers
     {
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PromotionGetDTO>> AddPromotion(PromotionPostDTO promotionPostDTO)
         {
             try
@@ -23,6 +25,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PromotionGetDTO>> GetPromotionById(int id)
         {
             try
@@ -40,6 +43,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<PromotionGetDTO>>> GetAllPromotions()
         {
             try
@@ -52,7 +56,38 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return StatusCode(500, $"An error occurred while retrieving promotions: {ex.Message}");
             }
         }
+        [HttpGet("active/{id}")]
+        public async Task<ActionResult<PromotionGetDTO>> GetActivePromotionById(int id)
+        {
+            try
+            {
+                var promotion = await promotionService.GetActivePromotionByIdAsync(id);
+                if (promotion == null)
+                {
+                    return NotFound();
+                }
+                return Ok(promotion);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving the active promotion: {ex.Message}");
+            }
+        }
+        [HttpGet("active")]
+        public async Task<ActionResult<IEnumerable<PromotionGetDTO>>> GetAllActivePromotions()
+        {
+            try
+            {
+                var promotions = await promotionService.GetAllActivePromotionsAsync();
+                return Ok(promotions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while retrieving active promotions: {ex.Message}");
+            }
+        }
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PromotionGetDTO>> UpdatePromotion(int id, PromotionPutDTO promotionPutDTO)
         {
             try
@@ -70,6 +105,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeletePromotion(int id)
         {
             try
