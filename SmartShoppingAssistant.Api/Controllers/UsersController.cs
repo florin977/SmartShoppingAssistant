@@ -36,7 +36,6 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return Unauthorized(new { message = ex.Message });
             }
         }
-        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

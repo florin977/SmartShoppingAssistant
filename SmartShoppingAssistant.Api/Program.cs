@@ -10,6 +10,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.AI;
+using Microsoft.OpenApi;
+using OpenAI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +47,20 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
+var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o";
+
+builder.Services.AddSingleton<IChatClient>(
+        new OpenAIClient(openAiApiKey)
+        .GetChatClient(openAiModel)
+        .AsIChatClient()
+        .AsBuilder()
+        .UseFunctionInvocation()
+        .Build()
+);
+
+builder.Services.AddScoped<IPromotionCheckerAgent, PromotionCheckerAgent>();
 
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles

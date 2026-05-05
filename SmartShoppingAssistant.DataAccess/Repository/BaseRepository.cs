@@ -105,5 +105,9 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 throw new Exception($"An error occurred while updating the entity: {ex.Message}", ex);
             }
         }
+        public IQueryable<TEntity> GetAllAsQueryable()
+        {
+            return context.Set<TEntity>();
+        }
     }
 }

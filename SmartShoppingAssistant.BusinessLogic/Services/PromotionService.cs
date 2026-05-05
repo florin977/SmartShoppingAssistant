@@ -47,5 +47,10 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var activePromotions = await promotionRepository.GetAllActivePromotionsAsync();
             return mapper.Map<List<PromotionGetDTO>>(activePromotions);
         }
+        public async Task<List<PromotionGetDTO>> GetForProductAsync(int productId)
+        {
+            var promotionsForProduct = await promotionRepository.GetForProductAsync(productId);
+            return mapper.Map<List<PromotionGetDTO>>(promotionsForProduct);
+        }
     }
 }

@@ -11,5 +11,6 @@ namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
         Task DeleteAsync(int id);
         Task<PromotionGetDTO> GetActivePromotionByIdAsync(int id);
         Task<IEnumerable<PromotionGetDTO>> GetAllActivePromotionsAsync();
+        Task<List<PromotionGetDTO>> GetForProductAsync(int productId);
     }
 }

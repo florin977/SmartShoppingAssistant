@@ -6,5 +6,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository.Interfaces
     {
         Task<Promotion> GetActivePromotionByIdAsync(int id);
         Task<IEnumerable<Promotion>> GetAllActivePromotionsAsync();
+        Task<List<Promotion>> GetForProductAsync(int productId);
     }
 }
