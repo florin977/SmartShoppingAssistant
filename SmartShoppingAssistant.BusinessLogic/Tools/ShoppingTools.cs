@@ -2,14 +2,15 @@
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using System.ComponentModel;
 
-namespace SmartShoppingAssistant.BusinessLogic.Tools
+namespace SmartShoppingAssistantLigaAc.BusinessLogic.Tools;
+
+public static class ShoppingTools
 {
-    public static class ShoppingTools
+    [Description("Get all active promotions that apply to a specific product (by product ID or its category).")]
+    public static async Task<List<PromotionGetDTO>> GetPromotionsForProduct(
+        [Description("The product ID to check")] int productId,
+        IPromotionService promotionService)
     {
-        [Description("Get all promotions for a specific product")]
-        public static async Task<List<PromotionGetDTO>> GetPromotionsForProduct(IPromotionService promotionService, int productId)
-        {
-            return await promotionService.GetForProductAsync(productId);
-        }
+        return await promotionService.GetForProductAsync(productId);
     }
 }

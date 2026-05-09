@@ -13,6 +13,7 @@ using System.Text;
 using Microsoft.Extensions.AI;
 using Microsoft.OpenApi;
 using OpenAI;
+using SmartShoppingAssistantLigaAc.BusinessLogic.Agents;
 
 var builder = WebApplication.CreateBuilder(args);
 
