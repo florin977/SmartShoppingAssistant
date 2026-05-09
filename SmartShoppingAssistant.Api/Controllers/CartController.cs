@@ -45,7 +45,7 @@ namespace SmartShoppingAssistant.Api.Controllers
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
-                var cart = await cartService.GetCartAsync(userId);
+                var cart = await cartService.GetCartByUserIdAsync(userId);
                 return Ok(cart);
             }
             catch (Exception ex)

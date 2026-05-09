@@ -6,7 +6,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
 {
     public interface ICartService
     {
-        Task<CartGetDTO> GetCartAsync(int userId);
+        Task<CartGetDTO> GetCartByUserIdAsync(int userId);
         Task<CartGetDTO> AddItemToCartAsync(int userId, CartItemPostDTO cartItemPostDTO);
         Task<CartGetDTO> UpdateItemFromCartAsync(int userId, int itemId, CartItemPutDTO cartItemPutDTO);
         Task DeleteItemFromCartAsync(int userId, int itemId);

@@ -11,7 +11,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 {
     public class CartService(ICartRepository cartRepository, IMapper mapper) : ICartService
     {
-        public async Task<CartGetDTO> GetCartAsync(int userId)
+        public async Task<CartGetDTO> GetCartByUserIdAsync(int userId)
         {
             var cart = await cartRepository.GetCartByUserIdAsync(userId);
             var cartDTO = mapper.Map<CartGetDTO>(cart);

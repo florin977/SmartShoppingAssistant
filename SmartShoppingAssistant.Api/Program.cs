@@ -3,7 +3,6 @@ using SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles;
 using SmartShoppingAssistant.BusinessLogic.Services;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
-using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using System.Text.Json.Serialization;
@@ -11,8 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.AI;
-using Microsoft.OpenApi;
-using OpenAI;
+using OllamaSharp;
 using SmartShoppingAssistantLigaAc.BusinessLogic.Agents;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +47,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+/*
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
 var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o";
 
@@ -60,6 +59,17 @@ builder.Services.AddSingleton<IChatClient>(
         .UseFunctionInvocation()
         .Build()
 );
+*/
+
+builder.Services.AddSingleton<IChatClient>(sp =>
+{
+    IChatClient ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma4:e4b");
+
+    return ollamaClient
+        .AsBuilder()
+        .UseFunctionInvocation()
+        .Build();
+});
 
 builder.Services.AddScoped<IPromotionCheckerAgent, PromotionCheckerAgent>();
 
