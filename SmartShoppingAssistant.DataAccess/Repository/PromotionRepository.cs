@@ -39,5 +39,34 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 (p.CategoryId.HasValue && categoryIds.Contains(p.CategoryId.Value)))
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Promotion>> GetActivePromotionsForProductsAsync(IEnumerable<int> productIds)
+        {
+            var promotions = await context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .SelectMany(pr => pr.Promotions.Where(promo => promo.IsActive))
+                .Distinct()
+                .ToListAsync();
+
+            return promotions;
+        }
+
+        public async Task<IEnumerable<Promotion>> GetActivePromotionsForCategoriesAsync(IEnumerable<int> categoryIds)
+        {
+            var promotions = await context.Categories
+                .Where(c => categoryIds.Contains(c.Id))
+                .SelectMany(c => c.Promotions.Where(pr => pr.IsActive))
+                .Distinct()
+                .ToListAsync();
+
+            return promotions;
+        }
+        public async Task<IEnumerable<Promotion>> GetActivePromotionsForCartAsync()
+        {
+            var promotions = await context.Promotions
+                .Where(p => p.IsActive && !p.ProductId.HasValue && !p.CategoryId.HasValue)
+                .ToListAsync();
+
+            return promotions;
+        }
     }
 }

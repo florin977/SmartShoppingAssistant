@@ -12,8 +12,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             try
             {
                 var categories = await context.Set<Category>()
-                    .Include(c => c.Products)
-                    .Include(c => c.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
                 return categories;
             }
@@ -28,7 +26,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var categories = await context.Set<Category>()
                     .Where(c => ids.Contains(c.Id))
-                    .Include(c => c.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
 
                 return categories;
@@ -44,8 +41,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             try
             {
                 var category = await context.Set<Category>()
-               .Include(c => c.Products)
-               .Include(c => c.Promotions.Where(pr => pr.IsActive))
                .FirstOrDefaultAsync(c => c.Id == id);
 
                 if (category == null)

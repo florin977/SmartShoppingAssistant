@@ -9,5 +9,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository.Interfaces
     public interface IProductRepository : IRepository<Product>
     {
         Task<IEnumerable<Product>> GetFilteredAsync(ProductQueryParameters productQueryParameters);
+        Task<List<Product>> GetProductsWithIdsAsync(IEnumerable<int> ids);
     }
 }

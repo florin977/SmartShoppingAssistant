@@ -13,7 +13,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var product = await context.Set<Product>()
                .Include(p => p.Categories)
-               .Include(p => p.Promotions.Where(pr => pr.IsActive))
                .FirstOrDefaultAsync(p => p.Id == id);
 
                 if (product == null)
@@ -28,13 +27,27 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 throw new Exception($"An error occurred while fetching the product with ID {id}: {ex.Message}", ex);
             }
         }
+        public async Task<List<Product>> GetProductsWithIdsAsync(IEnumerable<int> ids)
+        {
+            try
+            {
+                var products = await context.Set<Product>()
+                    .Include(p => p.Categories)
+                    .Where(p => ids.Contains(p.Id))
+                    .ToListAsync();
+                return products;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while fetching products with specified IDs: {ex.Message}", ex);
+            }
+        }
         public async override Task<List<Product>> GetAllAsync()
         {
             try
             {
                 var products = await context.Set<Product>()
                     .Include(p => p.Categories)
-                    .Include(p => p.Promotions.Where(pr => pr.IsActive))
                     .ToListAsync();
                 return products;
             }
@@ -49,7 +62,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             {
                 var query = context.Set<Product>()
                     .Include(p => p.Categories)
-                    .Include(p => p.Promotions.Where(pr => pr.IsActive))
                     .AsQueryable();
                 if (!string.IsNullOrEmpty(productQueryParameters.Search))
                 {

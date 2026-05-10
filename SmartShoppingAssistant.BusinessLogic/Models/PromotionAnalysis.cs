@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text.Json.Serialization;
 
-namespace SmartShoppingAssistantLigaAc.BusinessLogic.Models;
+namespace SmartShoppingAssistant.BusinessLogic.Models;
 
 [Description("Promotion analysis for the current cart")]
 public sealed class PromotionAnalysis
@@ -22,11 +22,11 @@ public sealed class Deal
     public int ProductId { get; set; }
 
     [JsonPropertyName("description")]
-    public string Description { get; set; } = "";
+    public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("action")]
-    public string? Action { get; set; }
+    public string Action { get; set; } = string.Empty; // Changed from string?
 
     [JsonPropertyName("savings")]
-    public decimal? Savings { get; set; }
+    public decimal Savings { get; set; } = 0; // Changed from decimal?
 }

@@ -7,7 +7,7 @@ using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class PromotionService(IPromotionRepository promotionRepository, IMapper mapper) : IPromotionService
+    public class PromotionService(IPromotionRepository promotionRepository, IProductRepository productRepository, IMapper mapper) : IPromotionService
     {
         public async Task<PromotionGetDTO> AddAsync(PromotionPostDTO promotionPostDTO)
         {
@@ -51,6 +51,18 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         {
             var promotionsForProduct = await promotionRepository.GetForProductAsync(productId);
             return mapper.Map<List<PromotionGetDTO>>(promotionsForProduct);
+        }
+        public async Task<List<PromotionGetDTO>> GetAllActivePromotionsForCart(IEnumerable<int> productIds)
+        {
+            List<Product> productsInCart = await productRepository.GetProductsWithIdsAsync(productIds);
+            List<int> categoryIds = productsInCart.SelectMany(p => p.Categories).Select(c => c.Id).Distinct().ToList();
+
+            var productPromotions = await promotionRepository.GetActivePromotionsForProductsAsync(productIds);
+            var categoryPromotions = await promotionRepository.GetActivePromotionsForCategoriesAsync(categoryIds);
+            var cartPromotions = await promotionRepository.GetActivePromotionsForCartAsync();
+
+            var relevantPromotions = productPromotions.Concat(categoryPromotions).Concat(cartPromotions).DistinctBy(p => p.Id).ToList();
+            return mapper.Map<List<PromotionGetDTO>>(relevantPromotions);
         }
     }
 }

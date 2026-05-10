@@ -1,10 +1,11 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartShoppingAssistant.BusinessLogic.Models;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
-using SmartShoppingAssistantLigaAc.BusinessLogic.Agents;
-using SmartShoppingAssistantLigaAc.BusinessLogic.Models;
+using SmartShoppingAssistant.BusinessLogic.Agents;
+using SmartShoppingAssistant.BusinessLogic.Models;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -26,7 +27,7 @@ namespace SmartShoppingAssistant.Api.Controllers
 
             var cart = await cartService.GetCartByUserIdAsync(userId);
 
-            if (cart == null || !cart.CartItems.Any())
+            if (cart == null || !cart.Items.Any())
             {
                 return BadRequest("Your cart is empty. Add items to see promotion analysis.");
             }

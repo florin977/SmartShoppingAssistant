@@ -1,17 +1,17 @@
+using GenerativeAI.Microsoft;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.AI;
+using Microsoft.IdentityModel.Tokens;
+using SmartShoppingAssistant.BusinessLogic.Agents;
 using SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles;
 using SmartShoppingAssistant.BusinessLogic.Services;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.AI;
-using OllamaSharp;
-using SmartShoppingAssistantLigaAc.BusinessLogic.Agents;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,11 +61,27 @@ builder.Services.AddSingleton<IChatClient>(
 );
 */
 
+/*
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
-    IChatClient ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma4:e4b");
+    IChatClient ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma-store-agent");
 
     return ollamaClient
+        .AsBuilder()
+        .UseFunctionInvocation()
+        .Build();
+});
+*/
+
+builder.Services.AddSingleton<IChatClient>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    string apiKey = config["AIConfig:GoogleApiKey"] ?? throw new Exception("API Key missing!");
+    string modelId = config["AIConfig:ModelId"] ?? "gemini-1.5-flash";
+
+    IChatClient googleClient = new GenerativeAIChatClient(apiKey, modelId);
+
+    return googleClient
         .AsBuilder()
         .UseFunctionInvocation()
         .Build();

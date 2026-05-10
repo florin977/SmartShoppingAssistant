@@ -11,7 +11,8 @@ namespace SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles
     {
         public CategoryProfile() 
         {
-            CreateMap<Category, CategoryGetDTO>();
+            CreateMap<Category, CategoryGetDTO>()
+                .ForMember(dest => dest.Promotions, opt => opt.Ignore());
             CreateMap<CategoryPostDTO, Category>();
             CreateMap<CategoryPutDTO, Category>();
         }

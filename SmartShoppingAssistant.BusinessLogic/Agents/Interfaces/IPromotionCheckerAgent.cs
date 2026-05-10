@@ -1,6 +1,6 @@
 ﻿using Microsoft.Agents.AI;
 
-namespace SmartShoppingAssistantLigaAc.BusinessLogic.Agents;
+namespace SmartShoppingAssistant.BusinessLogic.Agents;
 
 public interface IPromotionCheckerAgent
 {
