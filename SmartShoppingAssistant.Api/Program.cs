@@ -28,7 +28,7 @@ builder.Services.AddControllers()
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var ConnectionString = builder.Configuration.GetConnectionString("ExperimentDatabase");
+var ConnectionString = builder.Configuration.GetConnectionString("SmartShoppingAssistantDb");
 
 builder.Services.AddDbContext<SmartShoppingAssistantDbContext>(options =>
     options.UseSqlServer(ConnectionString));
@@ -49,7 +49,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // OpenAI API
-
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
 var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o";
 
@@ -90,8 +89,8 @@ builder.Services.AddSingleton<IChatClient>(sp =>
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
-    string apiKey = config["AIConfig:GoogleApiKey"] ?? throw new Exception("API Key missing!");
-    string modelId = config["AIConfig:ModelId"] ?? "gemini-1.5-flash";
+    string apiKey = config["GoogleAIConfig:GoogleApiKey"] ?? throw new Exception("API Key missing!");
+    string modelId = config["GoogleAIConfig:ModelId"] ?? "gemini-1.5-flash";
 
     IChatClient googleClient = new GenerativeAIChatClient(apiKey, modelId);
 
