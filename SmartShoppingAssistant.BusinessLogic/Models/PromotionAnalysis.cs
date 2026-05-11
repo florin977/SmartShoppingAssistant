@@ -25,8 +25,8 @@ public sealed class Deal
     public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("action")]
-    public string Action { get; set; } = string.Empty; // Changed from string?
+    public string Action { get; set; } = string.Empty; // Changed from string? Google free tier does not allow null values in the response, so we will use an empty string instead.
 
     [JsonPropertyName("savings")]
-    public decimal Savings { get; set; } = 0; // Changed from decimal?
+    public decimal Savings { get; set; } = 0; // Changed from decimal? Google free tier does not allow null values in the response, so we will use 0 as the default value instead.
 }

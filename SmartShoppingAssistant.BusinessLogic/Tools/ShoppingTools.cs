@@ -1,4 +1,5 @@
 ﻿using SmartShoppingAssistant.BusinessLogic.DTOs.PromotionDTOs;
+using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using System.ComponentModel;
 
@@ -26,5 +27,48 @@ public static class ShoppingTools
         Console.WriteLine("----------------------------------------------------------------------\n");
 
         return results;
+    }
+
+    [Description("Searches the store for products. Use this to find items that fulfill near-miss promotions by specifying a categoryId and a maxPrice.")]
+    public static async Task<List<object>> SearchProducts(
+        [Description("The exact ID of the category to search in. Use null if searching the entire store.")] int? categoryId,
+        [Description("The maximum price the user should pay to complete a near-miss promotion.")] decimal? maxPrice,
+        IProductService productService)
+    {
+        var queryParams = new ProductQueryDTO
+        {
+            CategoryId = categoryId,
+            MaxPrice = maxPrice,
+            Page = 1,
+            PageSize = 5,
+            SortBy = "price",
+            SortDirection = "asc"
+        };
+
+        var products = await productService.GetFilteredAsync(queryParams);
+
+        return products.Select(p => new
+        {
+            p.Id,
+            p.Name,
+            p.Price
+        }).ToList<object>();
+    }
+
+    [Description("Gets the details of a specific product by its exact ID. Use this when you already know the product ID needed for a promotion.")]
+    public static async Task<object?> GetProductById(
+    [Description("The exact ID of the product.")] int productId,
+    IProductService productService)
+    {
+        var product = await productService.GetByIdAsync(productId);
+
+        if (product == null) return null;
+
+        return new
+        {
+            product.Id,
+            product.Name,
+            product.Price
+        };
     }
 }

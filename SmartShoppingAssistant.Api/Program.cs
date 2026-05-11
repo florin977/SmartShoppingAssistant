@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
+using OpenAI;
 using SmartShoppingAssistant.BusinessLogic.Agents;
+using SmartShoppingAssistant.BusinessLogic.Agents.Interfaces;
 using SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles;
 using SmartShoppingAssistant.BusinessLogic.Services;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
+using System.ClientModel;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -47,6 +50,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// OpenAI API
 /*
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
 var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o";
@@ -61,17 +65,29 @@ builder.Services.AddSingleton<IChatClient>(
 );
 */
 
+// LM Studio API
 /*
+var lmStudioClient = new OpenAIClient(
+    new ApiKeyCredential("lm-studio"),
+    new OpenAIClientOptions
+    {
+        Endpoint = new Uri("http://localhost:1234/v1")
+    }
+);
+
+var openAiChatClient = lmStudioClient.GetChatClient("local-model");
+
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
-    IChatClient ollamaClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma-store-agent");
-
-    return ollamaClient
+    return openAiChatClient
+        .AsIChatClient()
         .AsBuilder()
         .UseFunctionInvocation()
         .Build();
 });
 */
+
+// Google API
 
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
@@ -87,7 +103,9 @@ builder.Services.AddSingleton<IChatClient>(sp =>
         .Build();
 });
 
+
 builder.Services.AddScoped<IPromotionCheckerAgent, PromotionCheckerAgent>();
+builder.Services.AddScoped<ISuggestionComposerAgent, SuggestionComposerAgent>();
 
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles

@@ -22,7 +22,16 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
 
             builder.HasMany(p => p.Categories)
                    .WithMany(c => c.Products)
-                   .UsingEntity(j => j.ToTable("ProductCategories"));
+                   .UsingEntity<Dictionary<string, object>>(
+                       "ProductCategories",
+                       right => right.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
+                       left => left.HasOne<Product>().WithMany().HasForeignKey("ProductId"),
+                       join =>
+                       {
+                           join.HasKey("ProductId", "CategoryId");
+                           join.ToTable("ProductCategories");
+                       }
+                   );
 
             builder.HasMany(p => p.Promotions)
                    .WithOne(pr => pr.Product)

@@ -33,24 +33,28 @@ public class PromotionCheckerAgent(IChatClient chatClient, IPromotionService pro
                         - Check Eligibility: 
                             - 'Quantity' deals: (Group Quantity >= Threshold).
                             - 'CartTotal' deals: (Group Total Price >= Threshold).
-                        - Identify Near-Misses: If not eligible, but user is within 2 units or $10.00 of the Threshold.
+                        - Identify Near-Misses: If not eligible, but user is within 2 units or 10.00 RON of the Threshold.
 
                         REWARD CALCULATION:
                         - 'PercentDiscount': Savings = (Group Total * RewardValue / 100).
                         - 'FreeItems': Savings = (RewardValue * Price of the cheapest item in the matched group).
 
+                        STACKING AND EXCLUSIVITY RULES (CRITICAL):
+                        - An individual item can only benefit from ONE active promotion.
+                        - Calculate the total savings for all eligible promotions.
+                        - You may apply a maximum of ONE Product-level, ONE Category-level, and ONE Cart-level promotion across the entire cart.
+                        - If multiple promotions overlap or compete for the same items, you MUST select the combination that yields the highest total 'savings' for the user, discarding the rest.
+
                         ACTION FIELD INSTRUCTIONS:
                         - For 'activeDeals': The action should be "Already applied".
                         - For 'nearMissDeals': The action MUST be a specific instruction for the next AI. 
-                          Example: "Add 1 more unit of ProductID [X] to qualify" or "Add $8.00 worth of items from CategoryID [Y] to qualify".
-                        - This allows the next AI to effectively suggest specific products to the user.
+                           Example: "Add 1 more unit of ProductID [X] to qualify" or "Add 8.00 RON worth of items from CategoryID [Y] to qualify".
 
                         OUTPUT REQUIREMENTS:
                         - You MUST use these exact JSON keys: "activeDeals" and "nearMissDeals".
-                        - Do NOT use "AppliedPromotions" or "NearMissPromotions".
                         - "activeDeals" should be a list of objects with: "promotionId", "productId", "description", "action", and "savings".
                         - "nearMissDeals" should be a list of objects with: "promotionId", "productId", "description", "action", and "savings".
-                        - Output ONLY raw JSON.
+                        - Output ONLY raw, valid JSON. Do not include markdown blocks like ```json.
                         """,
                     // Google's free tier API does not allow function calls + formatting, therefore we will not parse the response as a JSON.
                     //ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),

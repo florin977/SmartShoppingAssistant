@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartShoppingAssistant.DataAccess.Entities;
+using SmartShoppingAssistant.DataAccess.Seeding;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -24,6 +25,7 @@ namespace SmartShoppingAssistant.DataAccess
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SmartShoppingAssistantDbContext).Assembly);
+            modelBuilder.SeedAllData();
         }
     }
 }
