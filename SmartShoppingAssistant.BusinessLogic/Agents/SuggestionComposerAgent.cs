@@ -44,7 +44,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Agents
                         - "suggestions" should be an array of objects with: "productId", "productName", "price", "reason" (why you suggest it, referencing the near-miss deal or cross-sell logic).
                         - Output ONLY raw, valid JSON. Do not include markdown blocks like ```json.
                         """,
-                    //ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
+                    ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
                     Tools =
                     [
                         AIFunctionFactory.Create(

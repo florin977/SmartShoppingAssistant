@@ -1,4 +1,3 @@
-using GenerativeAI.Microsoft;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
@@ -12,7 +11,6 @@ using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
-using System.ClientModel;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -51,7 +49,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // OpenAI API
-/*
+
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
 var openAiModel = builder.Configuration["OpenAI:Model"] ?? "gpt-4o";
 
@@ -63,7 +61,7 @@ builder.Services.AddSingleton<IChatClient>(
         .UseFunctionInvocation()
         .Build()
 );
-*/
+
 
 // LM Studio API
 /*
@@ -88,7 +86,7 @@ builder.Services.AddSingleton<IChatClient>(sp =>
 */
 
 // Google API
-
+/*
 builder.Services.AddSingleton<IChatClient>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -102,7 +100,7 @@ builder.Services.AddSingleton<IChatClient>(sp =>
         .UseFunctionInvocation()
         .Build();
 });
-
+*/
 
 builder.Services.AddScoped<IPromotionCheckerAgent, PromotionCheckerAgent>();
 builder.Services.AddScoped<ISuggestionComposerAgent, SuggestionComposerAgent>();

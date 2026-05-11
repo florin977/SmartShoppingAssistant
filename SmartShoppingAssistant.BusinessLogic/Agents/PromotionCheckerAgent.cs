@@ -57,7 +57,7 @@ public class PromotionCheckerAgent(IChatClient chatClient, IPromotionService pro
                         - Output ONLY raw, valid JSON. Do not include markdown blocks like ```json.
                         """,
                     // Google's free tier API does not allow function calls + formatting, therefore we will not parse the response as a JSON.
-                    //ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
+                    ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
                     Tools =
                     [
                         AIFunctionFactory.Create(

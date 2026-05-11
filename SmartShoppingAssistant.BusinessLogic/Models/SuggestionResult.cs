@@ -16,11 +16,11 @@ public sealed class Suggestion
     public int ProductId { get; set; }
 
     [JsonPropertyName("productName")]
-    public string ProductName { get; set; } = string.Empty;
+    public string? ProductName { get; set; }
 
     [JsonPropertyName("price")]
-    public decimal Price { get; set; } = 0; // Google free tier does not allow null values in the response, so we will use 0 as the default value instead of making it nullable.
+    public decimal? Price { get; set; }
 
     [JsonPropertyName("reason")]
-    public string Reason { get; set; } = string.Empty; // Suggestion reason, referencing the near-miss deal or cross-sell logic.
+    public string? Reason { get; set; }
 }
