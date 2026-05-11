@@ -1,3 +1,4 @@
+using GenerativeAI.Microsoft;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
@@ -47,6 +48,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 
 // OpenAI API
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
