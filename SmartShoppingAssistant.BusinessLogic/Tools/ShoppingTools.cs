@@ -33,14 +33,16 @@ public static class ShoppingTools
     public static async Task<List<object>> SearchProducts(
         [Description("The exact ID of the category to search in. Use null if searching the entire store.")] int? categoryId,
         [Description("The maximum price the user should pay to complete a near-miss promotion.")] decimal? maxPrice,
+        [Description("The page number for pagination.")] int page,
+        [Description("The page size for pagination.")] int pageSize,
         IProductService productService)
     {
         var queryParams = new ProductQueryDTO
         {
             CategoryId = categoryId,
             MaxPrice = maxPrice,
-            Page = 1,
-            PageSize = 5,
+            Page = page,
+            PageSize = pageSize,
             SortBy = "price",
             SortDirection = "asc"
         };

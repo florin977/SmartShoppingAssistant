@@ -50,13 +50,7 @@ public class PromotionCheckerAgent(IChatClient chatClient, IPromotionService pro
                         - For 'nearMissDeals': The action MUST be a specific instruction for the next AI. 
                            Example: "Add 1 more unit of ProductID [X] to qualify" or "Add 8.00 RON worth of items from CategoryID [Y] to qualify".
 
-                        OUTPUT REQUIREMENTS:
-                        - You MUST use these exact JSON keys: "activeDeals" and "nearMissDeals".
-                        - "activeDeals" should be a list of objects with: "promotionId", "productId", "description", "action", and "savings".
-                        - "nearMissDeals" should be a list of objects with: "promotionId", "productId", "description", "action", and "savings".
-                        - Output ONLY raw, valid JSON. Do not include markdown blocks like ```json.
                         """,
-                    // Google's free tier API does not allow function calls + formatting, therefore we will not parse the response as a JSON.
                     ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
                     Tools =
                     [

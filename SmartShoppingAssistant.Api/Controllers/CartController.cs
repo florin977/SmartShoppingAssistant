@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartItemDTOs;
@@ -10,7 +11,7 @@ namespace SmartShoppingAssistant.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController(ICartService cartService) : ControllerBase
+    public class CartController(ICartService cartService, IMapper mapper) : ControllerBase
     {
         [HttpPost("items")]
         public async Task<ActionResult> AddItemToCart([FromBody] CartItemPostDTO cartItemPostDTO)
@@ -106,6 +107,19 @@ namespace SmartShoppingAssistant.Api.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+        [HttpPost("analyze")]
+        public async Task<IActionResult> AnalyzeCartWithAI()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { message = "User ID claim is missing or invalid." });
+            }
+
+            var response = await cartService.AnalyzeCartWithAI(userId);
+
+            return Ok(response);
         }
     }
 }

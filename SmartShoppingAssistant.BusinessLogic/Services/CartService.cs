@@ -1,15 +1,21 @@
 ﻿using AutoMapper;
+using Microsoft.Agents.AI.Workflows;
+using Microsoft.Extensions.AI;
+using SmartShoppingAssistant.BusinessLogic.Agents;
+using SmartShoppingAssistant.BusinessLogic.Agents.Interfaces;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartItemDTOs;
+using SmartShoppingAssistant.BusinessLogic.DTOs.CategoryDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.PromotionDTOs;
 using SmartShoppingAssistant.BusinessLogic.Helpers;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
+using System.Text.Json;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class CartService(ICartRepository cartRepository, IPromotionRepository promotionRepository, IMapper mapper) : ICartService
+    public class CartService(ICartRepository cartRepository, IPromotionRepository promotionRepository, ICategoryService categoryService, IPromotionCheckerAgent promotionCheckerAgent, ISuggestionComposerAgent suggestionComposerAgent, IMapper mapper) : ICartService
     {
         public async Task<CartGetDTO> GetCartByUserIdAsync(int userId)
         {
@@ -121,6 +127,60 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var cart = await cartRepository.GetCartByUserIdAsync(userId);
             cart.CartItems.Clear();
             await cartRepository.UpdateAsync(cart);
+        }
+
+        public async Task<AnalysisResponse> AnalyzeCartWithAI(int userId)
+        {
+            var cart = await cartRepository.GetCartByUserIdAsync(userId);
+
+            var cartJSON = JsonSerializer.Serialize(cart.CartItems.Select(ci => new
+            {
+                ci.Id,
+                ci.ProductId,
+                ci.Quantity,    
+                ci.Product.Name,
+                ci.Product.Price
+            }));
+
+            var categories = await categoryService.GetAllAsync();
+            var categorySlims = mapper.Map<List<CategorySlimGetDTO>>(categories);
+
+            var categoriesJSON = JsonSerializer.Serialize(categorySlims);
+
+            var promotionAgent = promotionCheckerAgent.Build(cartJSON);
+            var suggestionAgent = suggestionComposerAgent.Build(cartJSON, categoriesJSON);
+
+            var workflow = new WorkflowBuilder(promotionAgent).AddEdge(promotionAgent, suggestionAgent)
+                .WithOutputFrom(suggestionAgent)
+                .Build();
+
+            var chatMessage = new List<ChatMessage>
+            {
+                new(ChatRole.User, "Analyze the shopping cart and provide promotion insights and suggestions.")
+            };
+
+            await using var result = await InProcessExecution.RunStreamingAsync(workflow, chatMessage);
+
+            await result.TrySendMessageAsync(new TurnToken(emitEvents: true));
+
+            var jsonBuilder = new System.Text.StringBuilder();
+
+            await foreach (var message in result.WatchStreamAsync())
+            {
+                if (message is AgentResponseUpdateEvent update && update.ExecutorId.StartsWith("SuggestionComposer"))
+                {
+                    jsonBuilder.Append(update.Update.Text);
+                }
+                else if (message is WorkflowErrorEvent error)
+                {
+                    throw new InvalidOperationException(error.Exception.Message);
+                }
+            }
+
+            var json = jsonBuilder.ToString();
+
+            return JsonSerializer.Deserialize<AnalysisResponse>(json)
+                ?? throw new InvalidOperationException("Failed to deserialize the AI response into the expected format.");
         }
     }
 }

@@ -36,25 +36,21 @@ namespace SmartShoppingAssistant.Api.Controllers
             var agent1 = promotionCheckerAgent.Build(cartJSON);
             var response1 = await agent1.RunAsync("Analyze the cart for current promotions");
 
-            // Free API...so we wait a bit to avoid hitting rate limits.
-            await Task.Delay(4000);
-
             var promotionAnalysisJSON = response1.Text;
 
-            // Get all or get all that are in the cart ?
             var categories = await categoryService.GetAllAsync();
             var categorySlims = mapper.Map<List<CategorySlimGetDTO>>(categories);
 
             var categoriesJSON = JsonSerializer.Serialize(categorySlims);
 
-            var agent2 = suggestionComposerAgent.Build(cartJSON, promotionAnalysisJSON, categoriesJSON);
+            var agent2 = suggestionComposerAgent.Build(cartJSON, categoriesJSON);
             var response2 = await agent2.RunAsync("Generate product suggestions based on the cart and near-miss promotions.");
             var suggestionsJSON = response2.Text;
 
             try
             {
                 var analysisResult = JsonSerializer.Deserialize<PromotionAnalysis>(promotionAnalysisJSON);
-                var suggestionsResult = JsonSerializer.Deserialize<SuggestionResult>(suggestionsJSON);
+                var suggestionsResult = JsonSerializer.Deserialize<AnalysisResponse>(suggestionsJSON);
                 return Ok(new
                 {
                     Promotions = analysisResult,

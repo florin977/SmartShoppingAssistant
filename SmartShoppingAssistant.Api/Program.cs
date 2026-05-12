@@ -106,6 +106,17 @@ builder.Services.AddSingleton<IChatClient>(sp =>
 builder.Services.AddScoped<IPromotionCheckerAgent, PromotionCheckerAgent>();
 builder.Services.AddScoped<ISuggestionComposerAgent, SuggestionComposerAgent>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAnyOrigin",
+        corsPolicyBuilder =>
+        {
+            corsPolicyBuilder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles
 // besides this one here since they are in the same assembly
