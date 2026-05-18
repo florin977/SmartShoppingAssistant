@@ -30,6 +30,14 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var productIds = cart.CartItems.Select(ci => ci.ProductId).Distinct().ToList();
             var categoryIds = cart.CartItems.SelectMany(ci => ci.Product.Categories.Select(c => c.Id)).Distinct().ToList();
 
+            bool hasCategoriesLoaded = cart.CartItems
+                    .All(ci => ci.Product.Categories != null);
+
+            if (!hasCategoriesLoaded)
+            {
+                Console.WriteLine("WARNING: Categories are not loaded! Check your Repository Eager Loading.");
+            }
+
             var productPromotions = await promotionRepository.GetActivePromotionsForProductsAsync(productIds);
             var categoryPromotions = await promotionRepository.GetActivePromotionsForCategoriesAsync(categoryIds);
             var cartPromotions = await promotionRepository.GetActivePromotionsForCartAsync();

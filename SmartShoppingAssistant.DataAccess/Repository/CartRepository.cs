@@ -11,6 +11,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             var cart = await context.Set<Cart>()
                  .Include(c => c.CartItems)
                      .ThenInclude(ci => ci.Product)
+                        .ThenInclude(p => p.Categories)
                  .FirstOrDefaultAsync(c => c.UserId == userId);
 
             // Ignore the warning, we will handle the case where the cart is null in the service layer, and create a new cart if it doesn't exist
