@@ -46,7 +46,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            // In the future: save the token as a httpOnly cookie and implement refresh tokens for better security
+            // Return the token as a string. The controller will handle the cookie.
             return TokenGeneration.GenerateJwtToken(user, configuration);
         }
         public async Task DeleteAsync(int id)

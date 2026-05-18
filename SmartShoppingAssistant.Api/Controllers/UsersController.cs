@@ -29,7 +29,19 @@ namespace SmartShoppingAssistant.Api.Controllers
             try
             {
                 var token = await userService.LoginAsync(userLoginDTO);
-                return Ok(new { token });
+
+                // Set the token as an HttpOnly cookie
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(1)
+                };
+
+                Response.Cookies.Append("jwtToken", token, cookieOptions);
+
+                return Ok(new { message = "Login successful." });
             }
             catch (Exception ex)
             {

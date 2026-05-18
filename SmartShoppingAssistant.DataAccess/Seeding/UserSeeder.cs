@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using SmartShoppingAssistant.DataAccess.Entities;
-// Make sure to include your Enums namespace!
 using SmartShoppingAssistant.DataAccess.Entities.Enums;
 
 namespace SmartShoppingAssistant.DataAccess.Seeding

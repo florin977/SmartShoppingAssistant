@@ -13,18 +13,29 @@ namespace SmartShoppingAssistant.Api.Controllers
     [ApiController]
     public class CartController(ICartService cartService, IMapper mapper) : ControllerBase
     {
+        private int? GetUserId()
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
         [HttpPost("items")]
         public async Task<ActionResult> AddItemToCart([FromBody] CartItemPostDTO cartItemPostDTO)
         {
             try
             {
-                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                var userId = GetUserId();
+                
+                if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
 
-                await cartService.AddItemToCartAsync(userId, cartItemPostDTO);
+                await cartService.AddItemToCartAsync(userId.Value, cartItemPostDTO);
                 return Ok(new { message = "Item added to cart successfully." });
             }
             catch (Exception ex)
@@ -41,12 +52,12 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                var userId = GetUserId();
+                if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
-                var cart = await cartService.GetCartByUserIdAsync(userId);
+                var cart = await cartService.GetCartByUserIdAsync(userId.Value);
                 return Ok(cart);
             }
             catch (Exception ex)
@@ -59,12 +70,12 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                var userId = GetUserId();
+                if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
-                await cartService.UpdateItemFromCartAsync(userId, itemId, cartItemPutDTO);
+                await cartService.UpdateItemFromCartAsync(userId.Value, itemId, cartItemPutDTO);
                 return Ok(new { message = "Cart item updated successfully." });
             }
             catch (Exception ex)
@@ -77,12 +88,12 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                var userId = GetUserId();
+                if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
-                await cartService.DeleteItemFromCartAsync(userId, itemId);
+                await cartService.DeleteItemFromCartAsync(userId.Value, itemId);
                 return Ok(new { message = "Cart item deleted successfully." });
             }
             catch (Exception ex)
@@ -95,12 +106,12 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+                var userId = GetUserId();
+                if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
                 }
-                await cartService.DeleteEntireCartAsync(userId);
+                await cartService.DeleteEntireCartAsync(userId.Value);
                 return Ok(new { message = "Cart deleted successfully." });
             }
             catch (Exception ex)
@@ -111,13 +122,13 @@ namespace SmartShoppingAssistant.Api.Controllers
         [HttpPost("analyze")]
         public async Task<IActionResult> AnalyzeCartWithAI()
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            var userId = GetUserId();
+            if (userId == null)
             {
                 return Unauthorized(new { message = "User ID claim is missing or invalid." });
             }
 
-            var response = await cartService.AnalyzeCartWithAI(userId);
+            var response = await cartService.AnalyzeCartWithAI(userId.Value);
 
             return Ok(response);
         }

@@ -116,6 +116,34 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddCors(options =>
+{
+    // LOCAL DEVELOPMENT ONLY
+    // This policy dynamically echoes any origin to bypass the browser's 
+    // restriction against wildcards + credentials. Security risk if used in production!
+    options.AddPolicy("LocalDevCors",
+        corsPolicyBuilder =>
+        {
+            corsPolicyBuilder
+                .SetIsOriginAllowed(origin => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+
+    //  PRODUCTION READY
+    // Strictly limits requests to the specified frontend URL.
+    options.AddPolicy("ProductionCors",
+        corsPolicyBuilder =>
+        {
+            corsPolicyBuilder
+                .WithOrigins("https://www.real-website-domain.com")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
+
 // AutoMapper
 // Ensure that BusinessLogic loads, no need to include all the profiles
 // besides this one here since they are in the same assembly
@@ -138,6 +166,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
             )
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Check for token in cookies
+                if (context.Request.Cookies.ContainsKey("jwtToken"))
+                {
+                    context.Token = context.Request.Cookies["jwtToken"];
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
 
 
@@ -152,6 +193,17 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("LocalDevCors");
+}
+else
+{
+    app.UseCors("ProductionCors");
+}
 
 // JWT authentication setup
 app.UseAuthentication();
