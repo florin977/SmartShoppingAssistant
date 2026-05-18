@@ -15,6 +15,7 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(ci => ci.CartId).IsRequired();
             builder.Property(ci => ci.ProductId).IsRequired();
             builder.Property(ci => ci.Quantity).IsRequired();
+            builder.Property(ci => ci.IsFreeGift).HasDefaultValue(false);
         }
     }
 }

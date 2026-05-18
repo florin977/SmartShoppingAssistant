@@ -14,6 +14,6 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs.CartItemDTOs
         public decimal Price { get; set; }
         public int Quantity { get; set; }
         public decimal Subtotal { get; set; }
-        //public bool isFreeGift { get; set; } = false;
+        public bool IsFreeGift { get; set; } = false;
     }
 }

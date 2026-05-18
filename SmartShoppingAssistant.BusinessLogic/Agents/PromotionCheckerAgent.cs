@@ -16,40 +16,50 @@ public class PromotionCheckerAgent(IChatClient chatClient, IPromotionService pro
             new ChatClientAgentOptions
             {
                 Name = "PromotionChecker",
-                Description = "Analyzes carts for potential savings and near-miss deals.",
+                Description = "Analyzes carts for potential savings and calculates near-miss deals.",
                 ChatOptions = new ChatOptions
                 {
                     Instructions = $"""
-                        You are a high-precision retail logic engine mimicking a server-side PromotionEvaluator.
-                        User Cart: {cartJson}
+                        You are a high-precision retail logic engine mimicking a server-side Strategy Pattern Promotion Evaluator.
+                        You must evaluate promotions EXACTLY as the C# backend does.
 
-                        MAPPING LOGIC (Precedence: Product > Category > Global):
-                        1. If 'productId' is present: Link the promotion ONLY to that specific item.
-                        2. If 'productId' is missing BUT 'categoryId' is present: Aggregate all items in the cart belonging to that category and apply the promotion to that group.
-                        3. If BOTH are missing: Apply the promotion to the entire cart total and total quantity.
+                        CURRENT USER CART: 
+                        {cartJson}
 
-                        CORE EVALUATION STEPS:
-                        - Group items based on the Mapping Logic above.
-                        - Check Eligibility: 
-                            - 'Quantity' deals: (Group Quantity >= Threshold).
-                            - 'CartTotal' deals: (Group Total Price >= Threshold).
-                        - Identify Near-Misses: If not eligible, but user is within 2 units or 10.00 RON of the Threshold.
+                        --- PHASE 1: EXACT BACKEND EVALUATION (THE "ACTIVE" DEALS) ---
+                        You must evaluate promotions sequentially across 3 levels. Maintain a 'RunningTotal' (starting at the cart Subtotal).
+                        If a promotion applies, subtract its savings from the 'RunningTotal' BEFORE moving to the next level.
 
-                        REWARD CALCULATION:
-                        - 'PercentDiscount': Savings = (Group Total * RewardValue / 100).
-                        - 'FreeItems': Savings = (RewardValue * Price of the cheapest item in the matched group).
+                        1. PRODUCT LEVEL: Find all promotions with a specific 'productId'. 
+                           - Pick the SINGLE best product promotion (highest savings). 
+                           - Apply it and reduce RunningTotal by the savings.
+                        2. CATEGORY LEVEL: Find all promotions with a 'categoryId'. 
+                           - Evaluate them using the items in that category. 
+                           - Pick the SINGLE best category promotion. 
+                           - Apply it and reduce RunningTotal by the savings.
+                        3. CART LEVEL: Find all global promotions (no productId/categoryId). 
+                           - Evaluate against the CURRENT 'RunningTotal'. 
+                           - Pick the SINGLE best cart promotion.
 
-                        STACKING AND EXCLUSIVITY RULES (CRITICAL):
-                        - An individual item can only benefit from ONE active promotion.
-                        - Calculate the total savings for all eligible promotions.
-                        - You may apply a maximum of ONE Product-level, ONE Category-level, and ONE Cart-level promotion across the entire cart.
-                        - If multiple promotions overlap or compete for the same items, you MUST select the combination that yields the highest total 'savings' for the user, discarding the rest.
+                        REWARD MATH:
+                        - 'PercentDiscount': Savings = Applicable Total * (RewardValue / 100).
+                        - 'FreeItems': Savings = RewardValue * Price of the cheapest applicable item.
 
-                        ACTION FIELD INSTRUCTIONS:
-                        - For 'activeDeals': The action should be "Already applied".
-                        - For 'nearMissDeals': The action MUST be a specific instruction for the next AI. 
-                           Example: "Add 1 more unit of ProductID [X] to qualify" or "Add 8.00 RON worth of items from CategoryID [Y] to qualify".
+                        --- PHASE 2: NEAR-MISS CALCULATION ---
+                        Look at all the promotions that were NOT applied in Phase 1. 
+                        A "Near Miss" occurs ONLY when the cart fails the threshold condition, but is very close.
+                        
+                        Boundaries for a valid Near Miss:
+                        - 'Quantity' deals: The user is short by 1 or 2 items (Threshold - Current Quantity <= 2).
+                        - 'CartTotal' deals: The user is short by 20.00 RON or less (Threshold - Current Applicable Total <= 20.00).
 
+                        --- ACTION FIELD INSTRUCTIONS ---
+                        - For 'activeDeals': The action must be "Already applied".
+                        - For 'nearMissDeals': The action MUST be a specific, actionable instruction for the frontend or next AI to help the user qualify.
+                           - Examples: 
+                             - "Add 1 more unit of ProductID [X] to get 1 free!"
+                             - "Add 15.00 RON worth of items from Category [Y] to unlock 10% off."
+                             - "Spend 5.50 RON more to get 15% off your entire cart!"
                         """,
                     ResponseFormat = ChatResponseFormat.ForJsonSchema<PromotionAnalysis>(),
                     Tools =
@@ -58,7 +68,7 @@ public class PromotionCheckerAgent(IChatClient chatClient, IPromotionService pro
                             ([Description("An array of the product IDs currently in the user's cart.")] int[] productIds) =>
                                 ShoppingTools.GetRelevantPromotions(productIds, promotionService),
                             "GetRelevantPromotions",
-                            "Gets active promotions relevant to the products currently in the cart. Pass all product IDs from the cart as an array."
+                            "Gets all active product, category, and cart-wide promotions relevant to the user's current items. Always pass the product IDs found in the cart."
                         )
                     ]
                 }

@@ -7,7 +7,7 @@ using SmartShoppingAssistant.BusinessLogic.DTOs.CartDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartItemDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CategoryDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.PromotionDTOs;
-using SmartShoppingAssistant.BusinessLogic.Helpers;
+using SmartShoppingAssistant.BusinessLogic.PromotionLogic;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
@@ -30,14 +30,6 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var productIds = cart.CartItems.Select(ci => ci.ProductId).Distinct().ToList();
             var categoryIds = cart.CartItems.SelectMany(ci => ci.Product.Categories.Select(c => c.Id)).Distinct().ToList();
 
-            bool hasCategoriesLoaded = cart.CartItems
-                    .All(ci => ci.Product.Categories != null);
-
-            if (!hasCategoriesLoaded)
-            {
-                Console.WriteLine("WARNING: Categories are not loaded! Check your Repository Eager Loading.");
-            }
-
             var productPromotions = await promotionRepository.GetActivePromotionsForProductsAsync(productIds);
             var categoryPromotions = await promotionRepository.GetActivePromotionsForCategoriesAsync(categoryIds);
             var cartPromotions = await promotionRepository.GetActivePromotionsForCartAsync();
@@ -55,19 +47,10 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var cartDTO = new CartGetDTO
             {
                 Subtotal = finalSubtotal,
-                TotalDiscount = totalSavedOverall * -1, // Negative discounts, as per convention
+                TotalDiscount = totalSavedOverall,
                 Total = finalSubtotal - totalSavedOverall,
                 AppliedPromotions = appliedPromotions,
-
-                Items = cart.CartItems.Select(ci => new CartItemGetDTO
-                {
-                    Id = ci.Id,
-                    ProductId = ci.ProductId,
-                    ProductName = ci.Product.Name,
-                    Price = ci.Product.Price,
-                    Quantity = ci.Quantity,
-                    Subtotal = ci.Quantity * ci.Product.Price
-                }).ToList()
+                Items = mapper.Map<List<CartItemGetDTO>>(cart.CartItems)
             };
 
             return cartDTO;

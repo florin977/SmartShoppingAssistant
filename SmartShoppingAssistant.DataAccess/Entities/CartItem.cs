@@ -6,6 +6,7 @@
         public int CartId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public bool IsFreeGift { get; set; } = false;
 
         public Product Product { get; set; } = null!;
         public Cart Cart { get; set; } = null!;
