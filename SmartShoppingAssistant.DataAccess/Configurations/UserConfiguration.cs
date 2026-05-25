@@ -31,6 +31,11 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
                    .WithOne(c => c.User)
                    .HasForeignKey<Cart>(c => c.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(u => u.Reviews)
+                     .WithOne(r => r.User)
+                     .HasForeignKey(r => r.UserId)
+                     .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

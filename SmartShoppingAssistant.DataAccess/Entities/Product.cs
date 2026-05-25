@@ -8,10 +8,13 @@
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = null!;
         public int Stock { get; set; }
+        public decimal Rating { get; set; }
+        public int ReviewsCount { get; set; }
 
         public ICollection<Category> Categories { get; set; } = new List<Category>();
         public ICollection<Promotion> Promotions { get; set; } = new List<Promotion>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     }
 }

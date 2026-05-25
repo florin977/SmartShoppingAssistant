@@ -17,6 +17,8 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(p => p.Price).IsRequired().HasColumnType("decimal(10,2)");
             builder.Property(p => p.ImageUrl).HasMaxLength(500);
             builder.Property(p => p.Stock).IsRequired();
+            builder.Property(p => p.Rating).HasColumnType("decimal(10,2)");
+            builder.Property(p => p.ReviewsCount).IsRequired();
             // Ensure the stock never goes negative
             builder.ToTable(t => t.HasCheckConstraint("CK_Product_Stock_NonNegative", "[Stock] >= 0"));
 
@@ -41,6 +43,11 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.HasMany(p => p.CartItems)
                    .WithOne(ci => ci.Product)
                    .HasForeignKey(ci => ci.ProductId);
+
+            builder.HasMany(p => p.Reviews)
+                     .WithOne(r => r.Product)
+                     .HasForeignKey(r => r.ProductId)
+                     .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
