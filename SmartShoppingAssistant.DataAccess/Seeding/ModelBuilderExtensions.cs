@@ -13,6 +13,7 @@ namespace SmartShoppingAssistant.DataAccess.Seeding
             // 2. Dependent Entities
             ProductSeeder.Seed(modelBuilder);
             PromotionSeeder.Seed(modelBuilder);
+            ReviewSeeder.Seed(modelBuilder);
 
             // 3. Lowest level dependencies
             CartItemSeeder.Seed(modelBuilder);

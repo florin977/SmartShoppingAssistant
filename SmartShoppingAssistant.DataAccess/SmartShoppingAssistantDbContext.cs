@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Seeding;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SmartShoppingAssistant.DataAccess
 {
