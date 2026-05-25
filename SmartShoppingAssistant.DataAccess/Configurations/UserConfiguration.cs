@@ -16,6 +16,8 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
             builder.Property(u => u.PasswordHash).IsRequired().HasMaxLength(255);
             builder.Property(u => u.Role).IsRequired();
             builder.Property(u => u.CreatedAt).IsRequired();
+            builder.Property(u => u.LoginAttempts).IsRequired().HasDefaultValue(0);
+            builder.Property(u => u.LockedOutUntil).IsRequired(false);
 
             builder.HasMany(u => u.Orders)
                    .WithOne(o => o.User)

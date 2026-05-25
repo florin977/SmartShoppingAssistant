@@ -10,6 +10,8 @@ namespace SmartShoppingAssistant.DataAccess.Entities
         public string PasswordHash { get; set; } = null!;
         public UserRole Role { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int LoginAttempts { get; set; }
+        public DateTime? LockedOutUntil { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
