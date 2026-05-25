@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.AI;
 using Microsoft.IdentityModel.Tokens;
@@ -11,8 +12,10 @@ using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -181,6 +184,48 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Forwarded Headers setup to correctly identify client IPs and protocol when behind a reverse proxy (like Nginx or Cloudflare)
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+// Rate limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString();
+
+        string partitionKey;
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            partitionKey = $"User_{userId}";
+        }
+        else if (!string.IsNullOrWhiteSpace(clientIp))
+        {
+            partitionKey = $"IP_{clientIp}";
+        }
+        else
+        {
+            partitionKey = "Unknown";
+        }
+
+        return RateLimitPartition.GetTokenBucketLimiter(partitionKey, _ => new TokenBucketRateLimiterOptions
+        {
+            TokenLimit = 100, // Max 100 requests burst
+            TokensPerPeriod = 20, // Refill 20 tokens every period
+            ReplenishmentPeriod = TimeSpan.FromMinutes(1), // Refill every minute
+            AutoReplenishment = true
+        });
+    });
+});
 
 var app = builder.Build();
 
@@ -192,7 +237,11 @@ if (app.Environment.IsDevelopment())
        options.SwaggerEndpoint("/openapi/v1.json", "SmartShoppingAssistant API v1"));
 }
 
+app.UseForwardedHeaders();
+
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseRouting();
 
