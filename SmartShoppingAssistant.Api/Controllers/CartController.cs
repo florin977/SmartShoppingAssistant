@@ -12,7 +12,7 @@ namespace SmartShoppingAssistant.Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CartController(ICartService cartService, IMapper mapper) : ControllerBase
+    public class CartController(ICartService cartService) : ControllerBase
     {
         [HttpPost("items")]
         public async Task<ActionResult> AddItemToCart([FromBody] CartItemPostDTO cartItemPostDTO)
