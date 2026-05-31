@@ -8,7 +8,7 @@ namespace SmartShoppingAssistant.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController(IUserService userService) : ControllerBase
+    public class UsersController(IUserService userService, IConfiguration configuration) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<ActionResult<UserGetDTO>> Register(UserPostDTO userPostDTO)
@@ -28,18 +28,30 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var token = await userService.LoginAsync(userLoginDTO);
+                var (jwtToken, refreshToken) = await userService.LoginAsync(userLoginDTO);
+
+                double jwtLifespan = double.Parse(configuration["Jwt:ExpiresInMinutes"]!);
+                double refreshTokenLifetime = double.Parse(configuration["RefreshToken:ExpiresInDays"]!);
 
                 // Set the token as an HttpOnly cookie
-                var cookieOptions = new CookieOptions
+                var jwtCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddHours(1)
+                    Expires = DateTime.UtcNow.AddMinutes(jwtLifespan)
                 };
 
-                Response.Cookies.Append("jwtToken", token, cookieOptions);
+                var refreshCookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(refreshTokenLifetime)
+                };
+
+                Response.Cookies.Append("jwtToken", jwtToken, jwtCookieOptions);
+                Response.Cookies.Append("refreshToken", refreshToken, refreshCookieOptions);
 
                 return Ok(new { message = "Login successful." });
             }

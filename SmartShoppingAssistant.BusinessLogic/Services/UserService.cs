@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using SmartShoppingAssistant.BusinessLogic.DTOs.UserDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
-using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities.Enums;
-using Microsoft.Extensions.Configuration;
-using SmartShoppingAssistant.BusinessLogic.Helpers;
+using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration) : IUserService
+    public class UserService(IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository, IMapper mapper, IAuthService authService, IConfiguration configuration) : IUserService
     {
         public async Task<UserGetDTO> GetByIdAsync(int id)
         {
@@ -37,7 +36,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var createdUser = await userRepository.AddAsync(user);
             return mapper.Map<UserGetDTO>(createdUser);
         }
-        public async Task<string> LoginAsync(UserLoginDTO userLoginDTO)
+        public async Task<(string JwtToken, string RefreshToken)> LoginAsync(UserLoginDTO userLoginDTO)
         {
             var user = await userRepository.GetByEmailAsync(userLoginDTO.Email);
 
@@ -70,8 +69,22 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             user.LockedOutUntil = null;
             await userRepository.UpdateAsync(user);
 
-            // Return the token as a string. The controller will handle the cookie.
-            return TokenGeneration.GenerateJwtToken(user, configuration);
+            var jwtToken = authService.GenerateJwtToken(user);
+            var refreshToken = authService.GenerateRefreshToken();
+
+            double refreshTokenLifetime = double.Parse(configuration["RefreshToken:ExpiresInDays"]!);
+
+            var refreshTokenEntity = new RefreshToken
+            {
+                UserId = user.Id,
+                Token = refreshToken,
+                ExpiresAt = DateTime.UtcNow.AddDays(refreshTokenLifetime) // Refresh token valid for the specified number of days
+            };
+
+            await refreshTokenRepository.AddAsync(refreshTokenEntity);
+
+            // Return the tokens as a tuple. The controller will handle the cookie.
+            return (jwtToken, refreshToken);
         }
         public async Task DeleteAsync(int id)
         {

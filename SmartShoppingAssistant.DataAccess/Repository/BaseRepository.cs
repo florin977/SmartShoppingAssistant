@@ -25,7 +25,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             }
         }
 
-        public async Task DeleteAsync(int id)
+        virtual public async Task DeleteAsync(int id)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository
             }
         }
 
-        public async Task<TEntity> UpdateAsync(TEntity entity)
+        virtual public async Task<TEntity> UpdateAsync(TEntity entity)
         {
             try
             {

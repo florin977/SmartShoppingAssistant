@@ -6,7 +6,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
     {
         Task<UserGetDTO> GetByIdAsync(int id);
         Task<UserGetDTO> RegisterAsync(UserPostDTO userPostDTO);
-        Task<string> LoginAsync(UserLoginDTO userLoginDTO);
+        Task<(string JwtToken, string RefreshToken)> LoginAsync(UserLoginDTO userLoginDTO);
         Task DeleteAsync(int id);
     }
 }
