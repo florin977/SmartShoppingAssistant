@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.Api.Extensions;
 using SmartShoppingAssistant.BusinessLogic.DTOs.UserDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
-using System.Security.Claims;
 
 namespace SmartShoppingAssistant.Api.Controllers
 {
@@ -34,7 +33,7 @@ namespace SmartShoppingAssistant.Api.Controllers
 
         [HttpDelete("{id}")]
         [Authorize]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete([FromRoute] int id)
         {
             var userId = User.GetUserId();
             if (userId == null)

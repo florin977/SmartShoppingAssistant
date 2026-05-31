@@ -8,6 +8,8 @@ namespace SmartShoppingAssistant.BusinessLogic.AutoMapperProfiles
     {
         public UserProfile() 
         {
+
+            CreateMap<User, UserSummaryGetDTO>();
             CreateMap<User, UserGetDTO>();
             CreateMap<UserPostDTO, User>()
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())

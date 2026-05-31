@@ -7,7 +7,7 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs
         public int Id { get; set; }
         public int Rating { get; set; }
         public string? Text { get; set; }
-        public DateTime PostedAt { get; set; }
+        public DateOnly PostedAt { get; set; }
         public int Likes { get; set; }
 
         public UserSummaryGetDTO User { get; set; } = null!;

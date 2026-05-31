@@ -54,6 +54,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
 
 // OpenAI API
 var openAiApiKey = builder.Configuration["OpenAI:ApiKey"];
