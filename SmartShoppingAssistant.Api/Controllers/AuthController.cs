@@ -38,7 +38,8 @@ namespace SmartShoppingAssistant.Api.Controllers
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddDays(30)
+                    Expires = DateTime.UtcNow.AddDays(30),
+                    Path = "/api/auth/refresh" // Ensure the refresh token cookie is only sent to the refresh endpoint
                 };
 
                 Response.Cookies.Append("jwtToken", newJwtToken, jwtCookieOptions);
