@@ -52,6 +52,9 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
             catch (Exception ex)
             {
+                Response.Cookies.Delete("jwtToken");
+                Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/Auth" });
+
                 return Unauthorized(new { message = ex.Message });
             }
         }

@@ -59,7 +59,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 
             if (existingToken.RevokedAt != null)
             {
-                await refreshTokenRepository.RevokeAllUserTokensAsync(existingToken.UserId);// Revoke all tokens for the user
+                await LogoutAllDevicesAsync(existingToken.UserId); // Revoke all tokens for the user if a revoked token is used
                 throw new UnauthorizedAccessException("Refresh token has been revoked.");
             }
 
