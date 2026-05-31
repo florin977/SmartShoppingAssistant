@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartShoppingAssistant.Api.Extensions;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.CartItemDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
@@ -13,22 +14,12 @@ namespace SmartShoppingAssistant.Api.Controllers
     [ApiController]
     public class CartController(ICartService cartService, IMapper mapper) : ControllerBase
     {
-        private int? GetUserId()
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdClaim, out int userId))
-            {
-                return userId;
-            }
-            return null;
-        }
-
         [HttpPost("items")]
         public async Task<ActionResult> AddItemToCart([FromBody] CartItemPostDTO cartItemPostDTO)
         {
             try
             {
-                var userId = GetUserId();
+                var userId = User.GetUserId();
                 
                 if (userId == null)
                 {
@@ -52,7 +43,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userId = GetUserId();
+                var userId = User.GetUserId();
                 if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
@@ -70,7 +61,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userId = GetUserId();
+                var userId = User.GetUserId();
                 if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
@@ -88,7 +79,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userId = GetUserId();
+                var userId = User.GetUserId();
                 if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
@@ -106,7 +97,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         {
             try
             {
-                var userId = GetUserId();
+                var userId = User.GetUserId();
                 if (userId == null)
                 {
                     return Unauthorized(new { message = "User ID claim is missing or invalid." });
@@ -122,7 +113,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         [HttpPost("analyze")]
         public async Task<IActionResult> AnalyzeCartWithAI()
         {
-            var userId = GetUserId();
+            var userId = User.GetUserId();
             if (userId == null)
             {
                 return Unauthorized(new { message = "User ID claim is missing or invalid." });
