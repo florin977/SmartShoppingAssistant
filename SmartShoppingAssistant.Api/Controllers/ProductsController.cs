@@ -41,6 +41,21 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
 
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<ProductGetDTO>>> GetAll()
+        {
+            try
+            {
+                var products = await productService.GetAllAsync();
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error: " + ex.Message });
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<PagedResult<ProductGetDTO>>> GetFiltered([FromQuery] ProductQueryDTO productQuery)
         {
