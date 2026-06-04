@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.BusinessLogic.DTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
+using SmartShoppingAssistant.DataAccess.Parameters;
 
 namespace SmartShoppingAssistant.Api.Controllers
 {
@@ -41,7 +42,7 @@ namespace SmartShoppingAssistant.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductGetDTO>>> GetFiltered([FromQuery] ProductQueryDTO productQuery)
+        public async Task<ActionResult<PagedResult<ProductGetDTO>>> GetFiltered([FromQuery] ProductQueryDTO productQuery)
         {
             try
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartShoppingAssistant.DataAccess.Entities;
+using SmartShoppingAssistant.DataAccess.Parameters;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using SmartShoppingAssistant.DataAccess.Repository.Parameters;
 
@@ -56,13 +57,14 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 throw new Exception($"An error occurred while fetching products: {ex.Message}", ex);
             }
         }
-        public async Task<IEnumerable<Product>> GetFilteredAsync(ProductQueryParameters productQueryParameters)
+        public async Task<PagedResult<Product>> GetFilteredAsync(ProductQueryParameters productQueryParameters)
         {
             try
             {
                 var query = context.Set<Product>()
                     .Include(p => p.Categories)
                     .AsQueryable();
+
                 if (!string.IsNullOrEmpty(productQueryParameters.Search))
                 {
                     query = query.Where(p => p.Name.Contains(productQueryParameters.Search) || p.Description.Contains(productQueryParameters.Search));
@@ -95,12 +97,25 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                     }
                 }
 
+                // Total products found
+                var totalCount = await query.CountAsync();
+
                 // Pagination
                 query = query
                     .Skip((productQueryParameters.Page - 1) * productQueryParameters.PageSize)
                     .Take(productQueryParameters.PageSize);
 
-                return await query.ToListAsync();
+                // Total pages calculation
+                var totalPages = (int)Math.Ceiling(totalCount / (double)productQueryParameters.PageSize);
+
+                var pagedResult = new PagedResult<Product>
+                {
+                    Items = await query.ToListAsync(),
+                    TotalCount = totalCount,
+                    TotalPages = totalPages
+                };
+
+                return pagedResult;
             }
             catch (Exception ex)
             {

@@ -47,9 +47,9 @@ public static class ShoppingTools
             SortDirection = "asc"
         };
 
-        var products = await productService.GetFilteredAsync(queryParams);
+        var PagedProducts = await productService.GetFilteredAsync(queryParams);
 
-        return products.Select(p => new
+        return PagedProducts.Items.Select(p => new
         {
             p.Id,
             p.Name,

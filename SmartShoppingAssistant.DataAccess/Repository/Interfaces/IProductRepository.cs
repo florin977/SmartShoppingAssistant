@@ -1,4 +1,5 @@
 ﻿using SmartShoppingAssistant.DataAccess.Entities;
+using SmartShoppingAssistant.DataAccess.Parameters;
 using SmartShoppingAssistant.DataAccess.Repository.Parameters;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace SmartShoppingAssistant.DataAccess.Repository.Interfaces
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<IEnumerable<Product>> GetFilteredAsync(ProductQueryParameters productQueryParameters);
+        Task<PagedResult<Product>> GetFilteredAsync(ProductQueryParameters productQueryParameters);
         Task<List<Product>> GetProductsWithIdsAsync(IEnumerable<int> ids);
     }
 }

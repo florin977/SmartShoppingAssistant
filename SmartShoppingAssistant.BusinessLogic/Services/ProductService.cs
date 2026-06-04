@@ -3,6 +3,7 @@ using SmartShoppingAssistant.BusinessLogic.DTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess.Entities;
+using SmartShoppingAssistant.DataAccess.Parameters;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
@@ -20,11 +21,18 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             var products = await productRepository.GetAllAsync();
             return mapper.Map<IEnumerable<ProductGetDTO>>(products);
         }
-        public async Task<IEnumerable<ProductGetDTO>> GetFilteredAsync(ProductQueryDTO productQuery)
+        public async Task<PagedResult<ProductGetDTO>> GetFilteredAsync(ProductQueryDTO productQuery)
         {
             var queryParameters = mapper.Map<DataAccess.Repository.Parameters.ProductQueryParameters>(productQuery);
             var filteredProducts = await productRepository.GetFilteredAsync(queryParameters);
-            return mapper.Map<IEnumerable<ProductGetDTO>>(filteredProducts);
+            var productGetDTOs = mapper.Map<IEnumerable<ProductGetDTO>>(filteredProducts.Items);
+
+            return new PagedResult<ProductGetDTO>
+            {
+                Items = productGetDTOs,
+                TotalCount = filteredProducts.TotalCount,
+                TotalPages = filteredProducts.TotalPages
+            };
         }
 
         public async Task<ProductGetDTO> AddAsync(ProductPostDTO productPostDTO)
