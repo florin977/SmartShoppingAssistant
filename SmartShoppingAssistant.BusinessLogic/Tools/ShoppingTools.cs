@@ -31,7 +31,7 @@ public static class ShoppingTools
 
     [Description("Searches the store for products. Use this to find items that fulfill near-miss promotions by specifying a categoryId and a maxPrice.")]
     public static async Task<List<object>> SearchProducts(
-        [Description("The exact ID of the category to search in. Use null if searching the entire store.")] int? categoryId,
+        [Description("The exact IDs of the categories to search in. Use null if searching the entire store.")] IEnumerable<int>? categoryIds,
         [Description("The maximum price the user should pay to complete a near-miss promotion.")] decimal? maxPrice,
         [Description("The page number for pagination.")] int page,
         [Description("The page size for pagination.")] int pageSize,
@@ -39,7 +39,7 @@ public static class ShoppingTools
     {
         var queryParams = new ProductQueryDTO
         {
-            CategoryId = categoryId,
+            CategoryIds = categoryIds,
             MaxPrice = maxPrice,
             Page = page,
             PageSize = pageSize,

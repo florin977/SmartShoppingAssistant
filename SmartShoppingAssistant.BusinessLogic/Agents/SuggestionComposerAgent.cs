@@ -55,12 +55,12 @@ namespace SmartShoppingAssistant.BusinessLogic.Agents
                     Tools =
                     [
                         AIFunctionFactory.Create(
-                            ([Description("The exact ID of the category to search. Use null if searching the entire store.")] int? categoryId,
+                            ([Description("The exact IDs of the categories to search. Use null if searching the entire store.")] IEnumerable<int>? categoryIds,
                              [Description("The maximum price the user should pay to complete a near-miss promotion.")] decimal? maxPrice,
                              [Description("Always set this to 1 to avoid pagination loops.")] int page,
                              [Description("Set this to a high number (e.g., 20) to get plenty of options in one request.")] int pageSize
                              ) =>
-                                ShoppingTools.SearchProducts(categoryId, maxPrice, page, pageSize, productService),
+                                ShoppingTools.SearchProducts(categoryIds, maxPrice, page, pageSize, productService),
                             "SearchProducts",
                             "Searches the store for products. Use this to find items that fulfill near-miss promotions."
                         ),

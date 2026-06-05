@@ -77,9 +77,9 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 {
                     query = query.Where(p => p.Price <= productQueryParameters.MaxPrice.Value);
                 }
-                if (productQueryParameters.CategoryId.HasValue)
+                if (productQueryParameters.CategoryIds != null && productQueryParameters.CategoryIds.Any())
                 {
-                    query = query.Where(p => p.Categories.Any(c => c.Id == productQueryParameters.CategoryId.Value));
+                    query = query.Where(p => p.Categories.Any(c => productQueryParameters.CategoryIds.Contains(c.Id)));
                 }
                 if (!string.IsNullOrEmpty(productQueryParameters.SortBy))
                 {
