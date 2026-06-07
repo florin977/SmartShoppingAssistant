@@ -1,40 +1,57 @@
 ﻿using SmartShoppingAssistant.DataAccess.Entities;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using SmartShoppingAssistant.DataAccess.Parameters;
+using SmartShoppingAssistant.DataAccess.Repository.Parameters;
 
 namespace SmartShoppingAssistant.DataAccess.Repository
 {
     public class ReviewRepository(SmartShoppingAssistantDbContext context) : BaseRepository<Review>(context), IReviewRepository
     {
 
-        public async Task<List<Review>> GetReviewsByProductIdAsync(int productId)
+        public async Task<PagedResult<Review>> GetReviewsByProductIdAsync(int productId, PaginationParameters paginationParameters)
         {
-            var reviews = await context.Set<Review>().Where(r => r.ProductId == productId)
+            var query = context.Set<Review>().AsQueryable();
+
+            query = query.Where(r => r.ProductId == productId)
                 .Include(r => r.User)
-                .OrderByDescending(r => r.Likes) // TODO: maybe add more filters like rating, likes, etc.
+                .OrderByDescending(r => r.Likes);
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)paginationParameters.PageSize);
+
+            var reviews = await query.Skip((paginationParameters.Page - 1) * paginationParameters.PageSize)
+                .Take(paginationParameters.PageSize)
                 .ToListAsync();
 
-            if (reviews == null)
+            return new PagedResult<Review>
             {
-                throw new Exception($"No reviews found for product with id {productId}");
-            }
-
-            return reviews;
+                Items = reviews,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
         }
 
-        public async Task<List<Review>> GetReviewsByUserIdAsync(int userId)
+        public async Task<PagedResult<Review>> GetReviewsByUserIdAsync(int userId, PaginationParameters paginationParameters)
         {
-            var reviews = await context.Set<Review>().Where(r => r.UserId == userId)
+            var query = context.Set<Review>().AsQueryable();
+            query = query.Where(r => r.UserId == userId)
                 .Include(r => r.Product)
-                .OrderByDescending(r => r.Likes)
+                .OrderByDescending(r => r.Likes);
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)paginationParameters.PageSize);
+
+            var reviews = await query.Skip((paginationParameters.Page - 1) * paginationParameters.PageSize)
+                .Take(paginationParameters.PageSize)
                 .ToListAsync();
 
-            if (reviews == null)
+            return new PagedResult<Review>
             {
-                throw new Exception($"No reviews found for user with id {userId}");
-            }
-
-            return reviews;
+                Items = reviews,
+                TotalCount = totalCount,
+                TotalPages = totalPages
+            };
         }
     }
 }

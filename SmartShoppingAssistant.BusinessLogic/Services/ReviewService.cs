@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 using SmartShoppingAssistant.DataAccess;
 using SmartShoppingAssistant.DataAccess.Entities;
+using SmartShoppingAssistant.DataAccess.Parameters;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
+using SmartShoppingAssistant.DataAccess.Repository.Parameters;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
@@ -19,17 +22,30 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             }
             return mapper.Map<ProductReviewGetDTO>(review);
         }
-        public async Task<IEnumerable<ProductReviewGetDTO>> GetReviewsByProductIdAsync(int productId)
+        public async Task<PagedResult<ProductReviewGetDTO>> GetReviewsByProductIdAsync(int productId, PaginationQueryDTO paginationQuery)
         {
-            var reviews = await reviewRepository.GetReviewsByProductIdAsync(productId);
-            return mapper.Map<IEnumerable<ProductReviewGetDTO>>(reviews);
-            
+            var paginationParameters = mapper.Map<PaginationParameters>(paginationQuery);
+            var pagedResult = await reviewRepository.GetReviewsByProductIdAsync(productId, paginationParameters);
+            var productReviewGetDto = mapper.Map<IEnumerable<ProductReviewGetDTO>>(pagedResult.Items);
+            return new PagedResult<ProductReviewGetDTO>
+            {
+                Items = productReviewGetDto,
+                TotalCount = pagedResult.TotalCount,
+                TotalPages = pagedResult.TotalPages
+            };
         }
 
-        public async Task<IEnumerable<UserReviewGetDTO>> GetReviewsByUserIdAsync(int userId)
+        public async Task<PagedResult<UserReviewGetDTO>> GetReviewsByUserIdAsync(int userId, PaginationQueryDTO paginationQuery)
         {
-            var reviews = await reviewRepository.GetReviewsByUserIdAsync(userId);
-            return mapper.Map<IEnumerable<UserReviewGetDTO>>(reviews);
+            var paginationParameters = mapper.Map<PaginationParameters>(paginationQuery);
+            var pagedResult = await reviewRepository.GetReviewsByUserIdAsync(userId, paginationParameters);
+            var userReviewGetDto = mapper.Map<IEnumerable<UserReviewGetDTO>>(pagedResult.Items);
+            return new PagedResult<UserReviewGetDTO>
+            {
+                Items = userReviewGetDto,
+                TotalCount = pagedResult.TotalCount,
+                TotalPages = pagedResult.TotalPages
+            };
         }
 
         public async Task<ProductReviewGetDTO> AddReviewAsync(ReviewPostDTO reviewPostDTO, int userId)

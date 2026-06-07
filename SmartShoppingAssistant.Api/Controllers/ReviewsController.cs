@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartShoppingAssistant.Api.Extensions;
+using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs;
 using SmartShoppingAssistant.BusinessLogic.Services.Interfaces;
 
@@ -8,19 +9,19 @@ namespace SmartShoppingAssistant.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReviewsController(IReviewService reviewService, IConfiguration configuration) : ControllerBase
+    public class ReviewsController(IReviewService reviewService) : ControllerBase
     {
         [HttpGet("product/{productId}")]
-        public async Task<IActionResult> GetByProduct([FromRoute] int productId)
+        public async Task<IActionResult> GetByProduct([FromRoute] int productId, [FromQuery] PaginationQueryDTO paginationQuery)
         {
-            var reviews = await reviewService.GetReviewsByProductIdAsync(productId);
+            var reviews = await reviewService.GetReviewsByProductIdAsync(productId, paginationQuery);
             return Ok(reviews);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetByUser([FromRoute] int userId)
+        public async Task<IActionResult> GetByUser([FromRoute] int userId, [FromQuery] PaginationQueryDTO paginationQuery)
         {
-            var reviews = await reviewService.GetReviewsByUserIdAsync(userId);
+            var reviews = await reviewService.GetReviewsByUserIdAsync(userId, paginationQuery);
             return Ok(reviews);
         }
 

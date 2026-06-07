@@ -1,12 +1,14 @@
-﻿using SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs;
+﻿using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
+using SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs;
+using SmartShoppingAssistant.DataAccess.Parameters;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
 {
     public interface IReviewService
     {
         // Read Operations
-        Task<IEnumerable<ProductReviewGetDTO>> GetReviewsByProductIdAsync(int productId);
-        Task<IEnumerable<UserReviewGetDTO>> GetReviewsByUserIdAsync(int userId);
+        Task<PagedResult<ProductReviewGetDTO>> GetReviewsByProductIdAsync(int productId, PaginationQueryDTO paginationParameters);
+        Task<PagedResult<UserReviewGetDTO>> GetReviewsByUserIdAsync(int userId, PaginationQueryDTO paginationParameters);
         Task<ProductReviewGetDTO> GetByIdAsync(int reviewId);
 
         // Write Operations
