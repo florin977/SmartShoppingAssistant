@@ -37,6 +37,7 @@ namespace SmartShoppingAssistant.Api.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<CategoryGetDTO>>> GetAll()
         {
             try
