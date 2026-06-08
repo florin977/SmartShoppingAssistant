@@ -53,5 +53,16 @@ namespace SmartShoppingAssistant.DataAccess.Repository
                 TotalPages = totalPages
             };
         }
+        public async Task<Review> GetByProductAndUserId(int productId, int userId)
+        {
+            return await context.Set<Review>().FirstOrDefaultAsync(r => r.ProductId == productId && r.UserId == userId);
+        }
+
+        public override async Task<Review> GetByIdAsync(int id)
+        {
+            return await context.Set<Review>()
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
     }
 }

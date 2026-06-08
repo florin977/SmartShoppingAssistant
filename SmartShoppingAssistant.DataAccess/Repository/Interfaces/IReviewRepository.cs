@@ -8,5 +8,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository.Interfaces
     {
         Task<PagedResult<Review>> GetReviewsByProductIdAsync(int productId, PaginationParameters paginationParameters);
         Task<PagedResult<Review>> GetReviewsByUserIdAsync(int userId, PaginationParameters paginationParameters);
+        Task<Review> GetByProductAndUserId(int productId, int userId);
     }
 }

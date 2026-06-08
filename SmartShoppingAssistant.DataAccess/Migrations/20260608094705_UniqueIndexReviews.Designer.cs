@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartShoppingAssistant.DataAccess;
 
@@ -11,9 +12,11 @@ using SmartShoppingAssistant.DataAccess;
 namespace SmartShoppingAssistant.DataAccess.Migrations
 {
     [DbContext(typeof(SmartShoppingAssistantDbContext))]
-    partial class SmartShoppingAssistantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608094705_UniqueIndexReviews")]
+    partial class UniqueIndexReviews
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -998,15 +1001,12 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("Rating")
-                        .HasColumnType("decimal(3,2)");
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateOnly?>("UpdatedAt")
-                        .HasColumnType("date");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -1028,7 +1028,7 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                             Likes = 0,
                             PostedAt = new DateOnly(2024, 1, 10),
                             ProductId = 1,
-                            Rating = 5m,
+                            Rating = 5,
                             Text = "Excellent mouse! Very responsive and comfortable to use.",
                             UserId = 2
                         },
@@ -1038,7 +1038,7 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                             Likes = 0,
                             PostedAt = new DateOnly(2024, 1, 12),
                             ProductId = 1,
-                            Rating = 4m,
+                            Rating = 4,
                             Text = "Good value for the price. Battery life could be better.",
                             UserId = 3
                         },
@@ -1048,7 +1048,7 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                             Likes = 0,
                             PostedAt = new DateOnly(2024, 1, 15),
                             ProductId = 2,
-                            Rating = 3m,
+                            Rating = 3,
                             Text = "Sound quality is decent but not great. Comfortable fit though.",
                             UserId = 4
                         },
@@ -1058,7 +1058,7 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                             Likes = 0,
                             PostedAt = new DateOnly(2024, 1, 20),
                             ProductId = 3,
-                            Rating = 5m,
+                            Rating = 5,
                             Text = "Love this smartwatch! Great features and battery life.",
                             UserId = 5
                         },
@@ -1068,7 +1068,7 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                             Likes = 0,
                             PostedAt = new DateOnly(2024, 1, 22),
                             ProductId = 3,
-                            Rating = 4m,
+                            Rating = 4,
                             Text = "Very good smartwatch but a bit pricey.",
                             UserId = 2
                         });

@@ -6,6 +6,7 @@
         public int Rating { get; set; }
         public string? Text { get; set; }
         public DateOnly PostedAt { get; set; }
+        public DateOnly? UpdatedAt { get; set; }
         public int Likes { get; set; }
 
         // The flattened product data

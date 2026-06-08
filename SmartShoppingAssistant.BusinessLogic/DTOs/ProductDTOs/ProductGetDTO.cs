@@ -12,6 +12,8 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs
         public string Description { get; set; } = null!;
         public string ImageUrl { get; set; } = null!;
         public decimal Price { get; set; }
+        public decimal Rating { get; set; }
+        public int ReviewsCount { get; set; }
         public ICollection<CategoryGetDTO> Categories { get; set; } = null!;
         public ICollection<PromotionGetDTO> Promotions { get; set; } = null!;
     }

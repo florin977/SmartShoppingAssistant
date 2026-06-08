@@ -14,6 +14,9 @@ namespace SmartShoppingAssistant.BusinessLogic.Services.Interfaces
         // Write Operations
         Task<ProductReviewGetDTO> AddReviewAsync(ReviewPostDTO reviewPostDTO, int userId);
         Task<ProductReviewGetDTO> UpdateReviewAsync(int reviewId, ReviewPutDTO reviewPutDTO);
-        Task DeleteReviewAsync(int reviewId);
+        Task DeleteReviewAsync(int reviewId); 
+        Task<ProductReviewGetDTO> GetByProductAndUserId(int productId, int userId);
+
+
     }
 }

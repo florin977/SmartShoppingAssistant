@@ -5,6 +5,7 @@ namespace SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs
     public class ReviewPostDTO
     {
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Product ID must be a positive integer.")]
         public int ProductId { get; set; }
 
         [Required]

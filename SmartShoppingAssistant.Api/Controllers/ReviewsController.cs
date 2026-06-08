@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartShoppingAssistant.Api.Extensions;
 using SmartShoppingAssistant.BusinessLogic.DTOs.QueryDTOs;
 using SmartShoppingAssistant.BusinessLogic.DTOs.ReviewDTOs;
@@ -25,9 +26,9 @@ namespace SmartShoppingAssistant.Api.Controllers
             return Ok(reviews);
         }
 
-        [HttpPost]
+        [HttpGet("products/{productId}/me")]
         [Authorize]
-        public async Task<IActionResult> AddReview(ReviewPostDTO reviewPostDTO)
+        public async Task<IActionResult> GetByProductAndUserId([FromRoute] int productId)
         {
             var userId = User.GetUserId();
             if (userId == null)
@@ -35,14 +36,44 @@ namespace SmartShoppingAssistant.Api.Controllers
                 return Unauthorized(new { message = "User ID not found in token." });
             }
 
-            var review = await reviewService.AddReviewAsync(reviewPostDTO, userId.Value);
-
+            var review = await reviewService.GetByProductAndUserId(productId, userId.Value);
             if (review == null)
             {
-                return BadRequest(new { message = "Failed to add review." });
+                return NoContent();
             }
 
             return Ok(review);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddReview(ReviewPostDTO reviewPostDTO)
+        {
+            try
+            {
+                var userId = User.GetUserId();
+                if (userId == null)
+                {
+                    return Unauthorized(new { message = "User ID not found in token." });
+                }
+
+                var review = await reviewService.AddReviewAsync(reviewPostDTO, userId.Value);
+
+                if (review == null)
+                {
+                    return BadRequest(new { message = "Failed to add review." });
+                }
+
+                return Ok(review);
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest(new { message = "Failed to add review. You may have already reviewed this product." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while adding the review.", details = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

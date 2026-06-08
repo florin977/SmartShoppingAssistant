@@ -13,9 +13,13 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
 
             builder.Property(r => r.ProductId).IsRequired();
             builder.Property(r => r.UserId).IsRequired();
-            builder.Property(r => r.Rating).IsRequired();
+            builder.Property(r => r.Rating).IsRequired().HasColumnType("decimal(3,2)");
             builder.Property(r => r.Text).HasMaxLength(1000);
             builder.Property(r => r.PostedAt).IsRequired();
+
+            builder.HasIndex(r => new { r.UserId, r.ProductId })
+                .IsUnique()
+                .HasDatabaseName("IX_Reviews_ProductId_UserId_Unique");
         }
     }
 }

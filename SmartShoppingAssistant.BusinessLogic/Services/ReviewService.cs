@@ -8,10 +8,11 @@ using SmartShoppingAssistant.DataAccess.Parameters;
 using SmartShoppingAssistant.DataAccess.Repository;
 using SmartShoppingAssistant.DataAccess.Repository.Interfaces;
 using SmartShoppingAssistant.DataAccess.Repository.Parameters;
+using System.Transactions;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class ReviewService(IReviewRepository reviewRepository, IMapper mapper, IUserRepository userRepository) : IReviewService
+    public class ReviewService(IReviewRepository reviewRepository, IProductRepository productRepository, IMapper mapper, IUserRepository userRepository) : IReviewService
     {
         public async Task<ProductReviewGetDTO> GetByIdAsync(int reviewId)
         {
@@ -47,14 +48,28 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
                 TotalPages = pagedResult.TotalPages
             };
         }
-
+        // Might have concurrency issues if multiple reviews are added/updated/deleted for the same product at the same time.
         public async Task<ProductReviewGetDTO> AddReviewAsync(ReviewPostDTO reviewPostDTO, int userId)
         {
             var reviewEntity = mapper.Map<Review>(reviewPostDTO);
             reviewEntity.UserId = userId;
             reviewEntity.PostedAt = DateOnly.FromDateTime(DateTime.UtcNow);
-            reviewEntity.Likes = 0; // Initialize likes to 0 for a new review
-            await reviewRepository.AddAsync(reviewEntity);
+            reviewEntity.UpdatedAt = null;
+            reviewEntity.Likes = 0;
+
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                await reviewRepository.AddAsync(reviewEntity);
+
+                var product = await productRepository.GetByIdAsync(reviewEntity.ProductId);
+
+                product.Rating = ((product.Rating * product.ReviewsCount) + reviewEntity.Rating) / (product.ReviewsCount + 1);
+                product.ReviewsCount++;
+
+                await productRepository.UpdateAsync(product);
+
+                transaction.Complete();
+            }
 
             reviewEntity.User = await userRepository.GetByIdAsync(reviewEntity.UserId);
             return mapper.Map<ProductReviewGetDTO>(reviewEntity);
@@ -64,18 +79,66 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
         {
             var reviewEntity = await reviewRepository.GetByIdAsync(reviewId);
 
+            reviewEntity.UpdatedAt = DateOnly.FromDateTime(DateTime.UtcNow); 
+            var oldRating = reviewEntity.Rating;
+
             mapper.Map(reviewPutDTO, reviewEntity);
 
-            await reviewRepository.UpdateAsync(reviewEntity);
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                await reviewRepository.UpdateAsync(reviewEntity);
+
+                if (oldRating != reviewEntity.Rating)
+                {
+                    var product = await productRepository.GetByIdAsync(reviewEntity.ProductId);
+
+                    decimal currentTotalStars = (product.Rating * product.ReviewsCount);
+                    product.Rating = (currentTotalStars - oldRating + reviewEntity.Rating) / product.ReviewsCount;
+
+                    await productRepository.UpdateAsync(product);
+                }
+
+                transaction.Complete();
+            }
 
             reviewEntity.User = await userRepository.GetByIdAsync(reviewEntity.UserId);
-
             return mapper.Map<ProductReviewGetDTO>(reviewEntity);
         }
 
         public async Task DeleteReviewAsync(int reviewId)
         {
-            await reviewRepository.DeleteAsync(reviewId);
+            var reviewEntity = await reviewRepository.GetByIdAsync(reviewId);
+            if (reviewEntity == null) return;
+
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                var product = await productRepository.GetByIdAsync(reviewEntity.ProductId);
+
+                if (product.ReviewsCount <= 1)
+                {
+                    product.Rating = 0;
+                    product.ReviewsCount = 0;
+                }
+                else
+                {
+                    product.Rating = ((product.Rating * product.ReviewsCount) - reviewEntity.Rating) / (product.ReviewsCount - 1);
+                    product.ReviewsCount--;
+                }
+
+                await productRepository.UpdateAsync(product);
+                await reviewRepository.DeleteAsync(reviewId);
+
+                transaction.Complete();
+            }
+        }
+        public async Task<ProductReviewGetDTO> GetByProductAndUserId(int productId, int userId)
+        {
+            var review = await reviewRepository.GetByProductAndUserId(productId, userId);
+            if (review == null)
+            {
+                return null;
+            }
+            return mapper.Map<ProductReviewGetDTO>(review);
         }
     }
 }
