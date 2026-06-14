@@ -17,5 +17,6 @@ namespace SmartShoppingAssistant.DataAccess.Entities
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public Cart Cart { get; set; } = null!;
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<WishlistItem> WishlistItems { get; set; } = new List<WishlistItem>();
     }
 }

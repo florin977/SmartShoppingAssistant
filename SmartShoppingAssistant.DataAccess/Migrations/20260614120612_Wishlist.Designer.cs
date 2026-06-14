@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartShoppingAssistant.DataAccess;
 
@@ -11,9 +12,11 @@ using SmartShoppingAssistant.DataAccess;
 namespace SmartShoppingAssistant.DataAccess.Migrations
 {
     [DbContext(typeof(SmartShoppingAssistantDbContext))]
-    partial class SmartShoppingAssistantDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260614120612_Wishlist")]
+    partial class Wishlist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1191,9 +1194,14 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId1");
 
                     b.HasIndex("UserId", "ProductId")
                         .IsUnique();
@@ -1330,10 +1338,14 @@ namespace SmartShoppingAssistant.DataAccess.Migrations
                         .IsRequired();
 
                     b.HasOne("SmartShoppingAssistant.DataAccess.Entities.User", "User")
-                        .WithMany("WishlistItems")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SmartShoppingAssistant.DataAccess.Entities.User", null)
+                        .WithMany("WishlistItems")
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Product");
 
