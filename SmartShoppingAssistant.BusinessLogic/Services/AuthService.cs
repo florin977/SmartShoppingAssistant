@@ -98,7 +98,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 
             var user = mapper.Map<User>(userPostDTO);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userPostDTO.Password);
-            // TODO: Assign role based on registration type (e.g., customer, admin)
+
             user.Role = UserRole.Customer;
             user.CreatedAt = DateTime.UtcNow;
 
@@ -124,14 +124,16 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
             {
                 user.LoginAttempts++;
 
-                if (user.LoginAttempts >= 5)
+                if (user.LoginAttempts >= 4)
                 {
                     user.LockedOutUntil = DateTime.UtcNow.AddMinutes(15);
                     user.LoginAttempts = 0; // Reset attempts after locking out
+                    await userRepository.UpdateAsync(user);
+                    throw new UnauthorizedAccessException("Account is locked. Please try again later.");
                 }
 
                 await userRepository.UpdateAsync(user);
-                throw new UnauthorizedAccessException("Invalid email or password.");
+                throw new UnauthorizedAccessException($"Invalid credentials. Failed attempts: {user.LoginAttempts}");
             }
 
             // Reset login attempts on successful login

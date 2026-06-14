@@ -39,7 +39,6 @@ namespace SmartShoppingAssistant.DataAccess.Repository
         {
             return await context.Set<WishlistItem>()
                 .Include(w => w.Product)
-                .Include(w => w.User)
                 .FirstOrDefaultAsync(w => w.Id == id);
         }
     }

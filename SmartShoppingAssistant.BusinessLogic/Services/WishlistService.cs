@@ -7,7 +7,7 @@ using SmartShoppingAssistant.DataAccess.Parameters;
 
 namespace SmartShoppingAssistant.BusinessLogic.Services
 {
-    public class WishlistService(IWishlistRepository wishlistRepository, IMapper mapper, IProductRepository productRepository) : IWishlistService
+    public class WishlistService(IWishlistRepository wishlistRepository, IMapper mapper, IProductRepository productRepository, IUserRepository userRepository) : IWishlistService
     {
         public async Task<WishlistItemGetDTO?> AddToWishlistAsync(WishlistItemPostDTO postDto, int userId)
         {
@@ -19,7 +19,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 
             var entity = mapper.Map<DataAccess.Entities.WishlistItem>(postDto);
             entity.UserId = userId;
-            entity.AddedAt = System.DateTime.UtcNow;
+            entity.AddedAt = DateTime.UtcNow;
 
             await wishlistRepository.AddAsync(entity);
 
@@ -35,7 +35,7 @@ namespace SmartShoppingAssistant.BusinessLogic.Services
 
         public async Task<PagedResult<WishlistItemGetDTO>> GetByUserIdAsync(int userId, PaginationQueryDTO paginationQuery)
         {
-            var paginationParameters = mapper.Map<SmartShoppingAssistant.DataAccess.Repository.Parameters.PaginationParameters>(paginationQuery);
+            var paginationParameters = mapper.Map<DataAccess.Repository.Parameters.PaginationParameters>(paginationQuery);
             var paged = await wishlistRepository.GetByUserIdAsync(userId, paginationParameters);
             var items = mapper.Map<IEnumerable<WishlistItemGetDTO>>(paged.Items);
             return new PagedResult<WishlistItemGetDTO>

@@ -12,6 +12,8 @@ namespace SmartShoppingAssistant.DataAccess.Configurations
 
             builder.HasIndex(w => new { w.UserId, w.ProductId }).IsUnique();
 
+            builder.Property(w => w.UserId).IsRequired();
+            builder.Property(w => w.ProductId).IsRequired();
             builder.Property(w => w.AddedAt).IsRequired();
 
             builder.HasOne(w => w.User)
